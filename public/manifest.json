@@ -1,0 +1,10 @@
+{
+  "name": "Recipe Box",
+  "short_name": "Recipes",
+  "description": "Your personal recipe collection and weekly meal planner",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#e07a3a",
+  "background_color": "#fdf6f0",
+  "icons": []
+}
