@@ -3,12 +3,12 @@ import { Box, Heading } from '@radix-ui/themes';
 import { toast } from 'sonner';
 import { RecipeForm } from '@/components/recipe-form';
 import { addRecipe } from '@/lib/db/operations';
-import type { Recipe } from '@/types/recipe';
+import type { RecipeFormData } from '@/types/recipe';
 
 export function AddRecipePage() {
   const navigate = useNavigate();
 
-  const handleSubmit = async (data: Omit<Recipe, 'id' | 'dateAdded' | 'timesShown'>) => {
+  const handleSubmit = async (data: RecipeFormData) => {
     try {
       await addRecipe(data);
       toast.success('Recipe added!');

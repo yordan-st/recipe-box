@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { useRecipes } from "@/hooks/useRecipes";
 import { RecipeCard } from "@/components/recipe-card";
 import { RecipeForm } from "@/components/recipe-form";
-import type { Recipe } from "@/types/recipe";
+import type { Recipe, RecipeFormData } from "@/types/recipe";
 
 export function RecipesListPage() {
   const { recipes, recipeCount, isLoading, deleteRecipe, updateRecipe } =
@@ -38,9 +38,7 @@ export function RecipesListPage() {
     setDeletingRecipe(null);
   };
 
-  const handleEditSubmit = async (
-    data: Omit<Recipe, "id" | "dateAdded" | "timesShown">,
-  ) => {
+  const handleEditSubmit = async (data: RecipeFormData) => {
     if (!editingRecipe) return;
     await updateRecipe(editingRecipe.id, data);
     toast.success("Recipe updated");

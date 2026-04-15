@@ -8,11 +8,15 @@ import {
 import type { Recipe } from '@/types/recipe';
 
 export function useRecipes() {
-  const recipes = useLiveQuery(() =>
-    db.recipes.orderBy('dateAdded').reverse().toArray()
-  );
+  const recipes = useLiveQuery(async () => {
+    const all = await db.recipes.orderBy('dateAdded').reverse().toArray();
+    return all.filter((r) => !r.deletedAt);
+  });
 
-  const recipeCount = useLiveQuery(() => db.recipes.count());
+  const recipeCount = useLiveQuery(async () => {
+    const all = await db.recipes.toArray();
+    return all.filter((r) => !r.deletedAt).length;
+  });
 
   return {
     recipes: recipes ?? [],

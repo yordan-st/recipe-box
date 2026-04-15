@@ -1,9 +1,11 @@
 import Dexie, { type Table } from 'dexie';
-import type { Recipe, WeeklyMenu } from '@/types/recipe';
+import type { Recipe, WeeklyMenu, UserPreferences, SyncMeta } from '@/types/recipe';
 
 export class RecipeBoxDB extends Dexie {
   recipes!: Table<Recipe, string>;
   weeklyMenus!: Table<WeeklyMenu, string>;
+  userPreferences!: Table<UserPreferences, string>;
+  syncMeta!: Table<SyncMeta, string>;
 
   constructor() {
     super('recipe-box');
@@ -14,8 +16,21 @@ export class RecipeBoxDB extends Dexie {
     });
 
     this.version(2).stores({
-      recipes: 'id, &url, dateAdded, lastShown',  // & = unique index on url
+      recipes: 'id, &url, dateAdded, lastShown',
       weeklyMenus: 'id, weekStart',
+    });
+
+    this.version(3).stores({
+      recipes: 'id, &url, dateAdded, lastShown, updatedAt, syncStatus',
+      weeklyMenus: 'id, weekStart',
+      userPreferences: 'id',
+      syncMeta: 'id',
+    }).upgrade(tx => {
+      return tx.table('recipes').toCollection().modify(recipe => {
+        recipe.tags = recipe.tags ?? [];
+        recipe.updatedAt = recipe.updatedAt ?? recipe.dateAdded;
+        recipe.syncStatus = recipe.syncStatus ?? 'pending';
+      });
     });
   }
 }

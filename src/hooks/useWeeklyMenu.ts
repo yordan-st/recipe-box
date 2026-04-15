@@ -42,6 +42,7 @@ export function useWeeklyMenu() {
     await replaceWeeklyMenu({
       weekStart,
       recipeIds,
+      manualSlots: {},
       generatedAt: Date.now(),
     });
 

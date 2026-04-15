@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { Flex, Button, Text, Box, TextField, TextArea } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { Cross2Icon, MagicWandIcon, UpdateIcon } from '@radix-ui/react-icons'
-import type { Recipe } from '@/types/recipe'
+import type { RecipeFormData } from '@/types/recipe'
 
 interface FetchResult {
   title: string
@@ -12,8 +12,8 @@ interface FetchResult {
 }
 
 interface RecipeFormProps {
-  initialData?: Partial<Recipe>
-  onSubmit: (data: Omit<Recipe, 'id' | 'dateAdded' | 'timesShown'>) => void
+  initialData?: Partial<RecipeFormData>
+  onSubmit: (data: RecipeFormData) => void
   onCancel?: () => void
   isLoading?: boolean
 }
@@ -118,6 +118,7 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
       imageUrl: imageUrl.trim() || undefined,
       ingredients,
       ingredientsSource: ingredients.length > 0 ? ingredientsSource : 'manual',
+      tags: initialData?.tags ?? [],
     })
   }
 
