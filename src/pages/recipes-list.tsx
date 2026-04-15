@@ -26,9 +26,13 @@ export function RecipesListPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredRecipes = searchQuery.trim()
-    ? recipes.filter((r) =>
-        r.title.toLowerCase().includes(searchQuery.trim().toLowerCase()),
-      )
+    ? recipes.filter((r) => {
+        const q = searchQuery.trim().toLowerCase();
+        return (
+          r.title.toLowerCase().includes(q) ||
+          r.tags?.some((tag) => tag.toLowerCase().includes(q))
+        );
+      })
     : recipes;
 
   const handleDeleteConfirm = async () => {

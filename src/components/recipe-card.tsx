@@ -1,4 +1,12 @@
 import { Card, Flex, Text, Heading, Badge, Box, Button, IconButton } from '@radix-ui/themes'
+
+const TAG_COLORS = ['orange', 'blue', 'green', 'purple', 'cyan', 'crimson', 'teal', 'plum'] as const
+
+function tagColor(tag: string) {
+  let hash = 0
+  for (const ch of tag) hash = ((hash << 5) - hash + ch.charCodeAt(0)) | 0
+  return TAG_COLORS[Math.abs(hash) % TAG_COLORS.length]
+}
 import { TrashIcon, Pencil1Icon, ExternalLinkIcon } from '@radix-ui/react-icons'
 import type { Recipe } from '@/types/recipe'
 
@@ -68,6 +76,18 @@ export function RecipeCard({ recipe, onDelete, onEdit, compact = false }: Recipe
               </a>
             </IconButton>
           </Flex>
+          {recipe.tags && recipe.tags.length > 0 && (
+            <Flex gap="1" wrap="wrap" mt="1">
+              {recipe.tags.slice(0, 2).map((tag) => (
+                <Badge key={tag} variant="soft" size="1" color={tagColor(tag)}>
+                  {tag}
+                </Badge>
+              ))}
+              {recipe.tags.length > 2 && (
+                <Badge variant="soft" size="1" color="gray">+{recipe.tags.length - 2}</Badge>
+              )}
+            </Flex>
+          )}
         </Box>
       </Card>
     )
@@ -103,6 +123,16 @@ export function RecipeCard({ recipe, onDelete, onEdit, compact = false }: Recipe
               {recipe.ingredientsSource}
             </Badge>
           </Flex>
+
+          {recipe.tags && recipe.tags.length > 0 && (
+            <Flex gap="1" wrap="wrap">
+              {recipe.tags.map((tag) => (
+                <Badge key={tag} variant="soft" size="1" color={tagColor(tag)}>
+                  {tag}
+                </Badge>
+              ))}
+            </Flex>
+          )}
 
           <Text size="2" color="gray">
             {recipe.ingredients.length} ingredient{recipe.ingredients.length !== 1 ? 's' : ''}

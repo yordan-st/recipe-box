@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react'
 import { Flex, Button, Text, Box, TextField, TextArea } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { Cross2Icon, MagicWandIcon, UpdateIcon } from '@radix-ui/react-icons'
+import { TagInput } from '@/components/tag-input'
 import type { RecipeFormData } from '@/types/recipe'
 
 interface FetchResult {
@@ -28,6 +29,7 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
   const [ingredientsSource, setIngredientsSource] = useState<'auto' | 'manual'>(
     initialData?.ingredientsSource ?? 'manual'
   )
+  const [tags, setTags] = useState<string[]>(initialData?.tags ?? [])
 
   const [errors, setErrors] = useState<{ url?: string; title?: string }>({})
   const [isFetching, setIsFetching] = useState(false)
@@ -118,7 +120,7 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
       imageUrl: imageUrl.trim() || undefined,
       ingredients,
       ingredientsSource: ingredients.length > 0 ? ingredientsSource : 'manual',
-      tags: initialData?.tags ?? [],
+      tags,
     })
   }
 
@@ -215,6 +217,13 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
               setIngredientsSource('manual')
             }}
           />
+        </Box>
+
+        <Box>
+          <Text as="label" size="2" weight="medium" mb="1">
+            Tags
+          </Text>
+          <TagInput tags={tags} onChange={setTags} />
         </Box>
 
         <Flex gap="3" mt="2" justify="end">
