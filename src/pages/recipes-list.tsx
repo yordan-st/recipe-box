@@ -1,33 +1,49 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { AlertDialog, Box, Button, Dialog, Flex, Grid, Heading, Text, TextField } from '@radix-ui/themes';
-import { MagnifyingGlassIcon, PlusIcon } from '@radix-ui/react-icons';
-import { toast } from 'sonner';
-import { useRecipes } from '@/hooks/useRecipes';
-import { RecipeCard } from '@/components/recipe-card';
-import { RecipeForm } from '@/components/recipe-form';
-import type { Recipe } from '@/types/recipe';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  AlertDialog,
+  Box,
+  Button,
+  Dialog,
+  Flex,
+  Grid,
+  Heading,
+  Text,
+  TextField,
+} from "@radix-ui/themes";
+import { MagnifyingGlassIcon, PlusIcon } from "@radix-ui/react-icons";
+import { toast } from "sonner";
+import { useRecipes } from "@/hooks/useRecipes";
+import { RecipeCard } from "@/components/recipe-card";
+import { RecipeForm } from "@/components/recipe-form";
+import type { Recipe } from "@/types/recipe";
 
 export function RecipesListPage() {
-  const { recipes, recipeCount, isLoading, deleteRecipe, updateRecipe } = useRecipes();
+  const { recipes, recipeCount, isLoading, deleteRecipe, updateRecipe } =
+    useRecipes();
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [deletingRecipe, setDeletingRecipe] = useState<Recipe | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredRecipes = searchQuery.trim()
-    ? recipes.filter((r) => r.title.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+    ? recipes.filter((r) =>
+        r.title.toLowerCase().includes(searchQuery.trim().toLowerCase()),
+      )
     : recipes;
 
   const handleDeleteConfirm = async () => {
     if (!deletingRecipe) return;
     await deleteRecipe(deletingRecipe.id);
-    toast.success('Recipe deleted');
+    toast.success("Recipe deleted");
     setDeletingRecipe(null);
   };
 
-  const handleEditSubmit = async (data: Omit<Recipe, 'id' | 'dateAdded' | 'timesShown'>) => {
+  const handleEditSubmit = async (
+    data: Omit<Recipe, "id" | "dateAdded" | "timesShown">,
+  ) => {
     if (!editingRecipe) return;
     await updateRecipe(editingRecipe.id, data);
+    toast.success("Recipe updated");
     setEditingRecipe(null);
   };
 
@@ -45,7 +61,11 @@ export function RecipesListPage() {
         <Flex align="center" gap="2">
           <Heading size="6">My Recipes</Heading>
           <Text size="2" color="gray">
-            ({searchQuery.trim() ? `${filteredRecipes.length} of ${recipeCount}` : recipeCount})
+            (
+            {searchQuery.trim()
+              ? `${filteredRecipes.length} of ${recipeCount}`
+              : recipeCount}
+            )
           </Text>
         </Flex>
         <Button asChild>
@@ -72,7 +92,9 @@ export function RecipesListPage() {
 
       {recipes.length === 0 ? (
         <Flex direction="column" align="center" gap="4" py="8">
-          <Text size="3" color="gray">No recipes yet. Add your first recipe!</Text>
+          <Text size="3" color="gray">
+            No recipes yet. Add your first recipe!
+          </Text>
           <Button asChild>
             <Link to="/add">
               <PlusIcon /> Add Recipe
@@ -81,12 +103,16 @@ export function RecipesListPage() {
         </Flex>
       ) : filteredRecipes.length === 0 ? (
         <Flex direction="column" align="center" gap="2" py="8">
-          <Text size="3" color="gray">No recipes match "{searchQuery}"</Text>
+          <Text size="3" color="gray">
+            No recipes match "{searchQuery}"
+          </Text>
         </Flex>
       ) : (
         <Grid
           gap="4"
-          style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          }}
         >
           {filteredRecipes.map((recipe) => (
             <RecipeCard
@@ -99,7 +125,12 @@ export function RecipesListPage() {
         </Grid>
       )}
 
-      <Dialog.Root open={editingRecipe !== null} onOpenChange={(open) => { if (!open) setEditingRecipe(null); }}>
+      <Dialog.Root
+        open={editingRecipe !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditingRecipe(null);
+        }}
+      >
         <Dialog.Content maxWidth="500px">
           <Dialog.Title>Edit Recipe</Dialog.Title>
           {editingRecipe && (
@@ -112,18 +143,28 @@ export function RecipesListPage() {
         </Dialog.Content>
       </Dialog.Root>
 
-      <AlertDialog.Root open={deletingRecipe !== null} onOpenChange={(open) => { if (!open) setDeletingRecipe(null); }}>
+      <AlertDialog.Root
+        open={deletingRecipe !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeletingRecipe(null);
+        }}
+      >
         <AlertDialog.Content maxWidth="450px">
           <AlertDialog.Title>Delete Recipe</AlertDialog.Title>
           <AlertDialog.Description size="2">
-            Are you sure you want to delete "{deletingRecipe?.title}"? This action cannot be undone.
+            Are you sure you want to delete this recipe? This action cannot be
+            undone.
           </AlertDialog.Description>
           <Flex gap="3" mt="4" justify="end">
             <AlertDialog.Cancel>
-              <Button variant="soft" color="gray">Cancel</Button>
+              <Button variant="soft" color="gray">
+                Cancel
+              </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action>
-              <Button variant="solid" color="red" onClick={handleDeleteConfirm}>Delete</Button>
+              <Button variant="solid" color="red" onClick={handleDeleteConfirm}>
+                Delete
+              </Button>
             </AlertDialog.Action>
           </Flex>
         </AlertDialog.Content>
