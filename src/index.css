@@ -9,6 +9,10 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body,
 #root {
@@ -21,4 +25,46 @@ body {
   background-color: #fdf6f0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Navigation */
+nav {
+  background: white;
+  border-bottom: 1px solid var(--gray-5);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--gray-11);
+  padding: 8px 12px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.nav-link:hover {
+  color: var(--accent-11);
+}
+
+.nav-link-active {
+  color: var(--accent-11);
+  font-weight: 600;
+  border-bottom: 2px solid var(--accent-9);
+}
+
+/* Card hover effects */
+.rt-Card {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.rt-Card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.rt-Card img {
+  border-radius: var(--radius-2) var(--radius-2) 0 0;
 }
