@@ -6,9 +6,10 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
-import { Theme, Flex, Container, IconButton } from "@radix-ui/themes";
-import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
+import { Theme, Flex, Container, IconButton, DropdownMenu } from "@radix-ui/themes";
+import { SunIcon, MoonIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Toaster } from "sonner";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { InstallPrompt } from "@/components/install-prompt";
 import { RecipesListPage } from "@/pages/recipes-list";
 import { AddRecipePage } from "@/pages/add-recipe";
@@ -52,7 +53,8 @@ function AppLayout({
             >
               Recipe Box
             </Link>
-            <Flex gap="3" ml="auto" align="center">
+            {/* Desktop nav */}
+            <Flex gap="3" ml="auto" align="center" className="nav-desktop">
               <NavLink to="/">Recipes</NavLink>
               <NavLink to="/add">Add</NavLink>
               <NavLink to="/weekly">Menu</NavLink>
@@ -65,16 +67,48 @@ function AppLayout({
                 {appearance === "dark" ? <SunIcon /> : <MoonIcon />}
               </IconButton>
             </Flex>
+
+            {/* Mobile nav */}
+            <Flex ml="auto" align="center" gap="2" className="nav-mobile">
+              <IconButton
+                size="2"
+                variant="ghost"
+                onClick={toggleAppearance}
+                aria-label="Toggle dark mode"
+              >
+                {appearance === "dark" ? <SunIcon /> : <MoonIcon />}
+              </IconButton>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                  <IconButton size="2" variant="ghost" aria-label="Menu">
+                    <HamburgerMenuIcon />
+                  </IconButton>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item asChild>
+                    <Link to="/" className="nav-dropdown-link">Recipes</Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link to="/add" className="nav-dropdown-link">Add Recipe</Link>
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item asChild>
+                    <Link to="/weekly" className="nav-dropdown-link">Weekly Menu</Link>
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            </Flex>
           </Flex>
         </Container>
       </nav>
 
       <Container size="3" px="4" flexGrow="1" py="4">
-        <Routes>
-          <Route path="/" element={<RecipesListPage />} />
-          <Route path="/add" element={<AddRecipePage />} />
-          <Route path="/weekly" element={<WeeklyViewPage />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<RecipesListPage />} />
+            <Route path="/add" element={<AddRecipePage />} />
+            <Route path="/weekly" element={<WeeklyViewPage />} />
+          </Routes>
+        </ErrorBoundary>
       </Container>
     </Flex>
   );

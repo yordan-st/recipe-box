@@ -18,6 +18,7 @@ import { useWeeklyMenu } from "@/hooks/useWeeklyMenu";
 import { RecipeCard } from "@/components/recipe-card";
 import { RecipeForm } from "@/components/recipe-form";
 import { SlotPickerDialog } from "@/components/slot-picker-dialog";
+import { SkeletonCard } from "@/components/skeleton-card";
 import type { Recipe, RecipeFormData } from "@/types/recipe";
 
 export function RecipesListPage() {
@@ -56,7 +57,10 @@ export function RecipesListPage() {
   if (isLoading) {
     return (
       <Box p="4">
-        <Text>Loading...</Text>
+        <Heading size="6" mb="4">My Recipes</Heading>
+        <Grid gap="4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
+          {Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
+        </Grid>
       </Box>
     );
   }

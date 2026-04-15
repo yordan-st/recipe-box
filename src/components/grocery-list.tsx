@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Box, Flex, Text, Heading, Checkbox } from '@radix-ui/themes'
 import type { Recipe } from '@/types/recipe'
 import {
@@ -9,6 +9,7 @@ import {
 
 interface GroceryListProps {
   recipes: Recipe[]
+  weekStart?: number
 }
 
 interface GroceryItem {
@@ -55,9 +56,21 @@ function groupByDepartment(items: GroceryItem[]): Map<Department, GroceryItem[]>
   return groups
 }
 
-export function GroceryList({ recipes }: GroceryListProps) {
+export function GroceryList({ recipes, weekStart }: GroceryListProps) {
   const items = aggregateIngredients(recipes)
-  const [checked, setChecked] = useState<Set<string>>(new Set())
+  const storageKey = weekStart ? `grocery-checked-${weekStart}` : null
+
+  const [checked, setChecked] = useState<Set<string>>(() => {
+    if (!storageKey) return new Set()
+    const stored = localStorage.getItem(storageKey)
+    return stored ? new Set(JSON.parse(stored)) : new Set()
+  })
+
+  useEffect(() => {
+    if (storageKey) {
+      localStorage.setItem(storageKey, JSON.stringify([...checked]))
+    }
+  }, [checked, storageKey])
 
   if (items.length === 0) {
     return (

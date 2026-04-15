@@ -55,6 +55,25 @@ nav {
   border-bottom: 2px solid var(--accent-9);
 }
 
+/* Responsive navigation */
+.nav-mobile {
+  display: none;
+}
+
+.nav-dropdown-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+@media (max-width: 640px) {
+  .nav-desktop {
+    display: none;
+  }
+  .nav-mobile {
+    display: flex;
+  }
+}
+
 /* Card hover effects */
 .rt-Card {
   transition: box-shadow 0.2s ease, transform 0.2s ease;

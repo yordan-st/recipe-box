@@ -71,6 +71,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
               size="1"
               variant="ghost"
               asChild
+              aria-label="Open recipe"
             >
               <a href={recipe.url} target="_blank" rel="noopener noreferrer">
                 <ExternalLinkIcon />
@@ -163,6 +164,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
                   size="2"
                   variant="ghost"
                   onClick={() => onEdit(recipe)}
+                  aria-label="Edit recipe"
                 >
                   <Pencil1Icon />
                 </IconButton>
@@ -173,6 +175,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
                   variant="ghost"
                   color="red"
                   onClick={() => onDelete(recipe.id)}
+                  aria-label="Delete recipe"
                 >
                   <TrashIcon />
                 </IconButton>

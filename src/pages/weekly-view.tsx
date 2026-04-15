@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { Heading, Text, Button, Flex, Box, Grid, Separator, Select } from '@radix-ui/themes';
 import { ReloadIcon, PlusIcon } from '@radix-ui/react-icons';
 import { MenuSlot } from '@/components/menu-slot';
+import { SkeletonCard } from '@/components/skeleton-card';
 import { RecipePickerDialog } from '@/components/recipe-picker-dialog';
 import { GroceryList } from '@/components/grocery-list';
 import { useWeeklyMenu } from '@/hooks/useWeeklyMenu';
+import { getWeekStartTimestamp } from '@/lib/algorithms/weekly-selection';
 import { useRecipes } from '@/hooks/useRecipes';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import type { Recipe } from '@/types/recipe';
@@ -49,7 +51,10 @@ export function WeeklyViewPage() {
   if (isLoading) {
     return (
       <Box p="4">
-        <Text>Loading...</Text>
+        <Heading size="6" mb="4">This Week's Menu</Heading>
+        <Grid columns={{ initial: '1', sm: '2' }} gap="4">
+          {Array.from({ length: menuSize }, (_, i) => <SkeletonCard key={i} compact />)}
+        </Grid>
       </Box>
     );
   }
@@ -142,7 +147,7 @@ export function WeeklyViewPage() {
 
           <Separator size="4" mb="4" />
 
-          <GroceryList recipes={filledRecipes} />
+          <GroceryList recipes={filledRecipes} weekStart={getWeekStartTimestamp()} />
         </>
       )}
 
