@@ -1,6 +1,11 @@
 import { useState } from 'react'
 import { Box, Flex, Text, Heading, Checkbox } from '@radix-ui/themes'
 import type { Recipe } from '@/types/recipe'
+import {
+  classifyIngredient,
+  DEPARTMENT_ORDER,
+  type Department,
+} from '@/lib/algorithms/department-classifier'
 
 interface GroceryListProps {
   recipes: Recipe[]
@@ -9,10 +14,11 @@ interface GroceryListProps {
 interface GroceryItem {
   text: string
   recipeTitles: string[]
+  department: Department
 }
 
 function aggregateIngredients(recipes: Recipe[]): GroceryItem[] {
-  const map = new Map<string, string[]>()
+  const map = new Map<string, { recipeTitles: string[]; original: string }>()
 
   for (const recipe of recipes) {
     for (const ingredient of recipe.ingredients) {
@@ -20,19 +26,33 @@ function aggregateIngredients(recipes: Recipe[]): GroceryItem[] {
       if (!key) continue
       const existing = map.get(key)
       if (existing) {
-        if (!existing.includes(recipe.title)) {
-          existing.push(recipe.title)
+        if (!existing.recipeTitles.includes(recipe.title)) {
+          existing.recipeTitles.push(recipe.title)
         }
       } else {
-        map.set(key, [recipe.title])
+        map.set(key, { recipeTitles: [recipe.title], original: ingredient.trim() })
       }
     }
   }
 
-  return Array.from(map.entries()).map(([text, recipeTitles]) => ({
-    text,
+  return Array.from(map.entries()).map(([, { recipeTitles, original }]) => ({
+    text: original,
     recipeTitles,
+    department: classifyIngredient(original),
   }))
+}
+
+function groupByDepartment(items: GroceryItem[]): Map<Department, GroceryItem[]> {
+  const groups = new Map<Department, GroceryItem[]>()
+  for (const item of items) {
+    const existing = groups.get(item.department)
+    if (existing) {
+      existing.push(item)
+    } else {
+      groups.set(item.department, [item])
+    }
+  }
+  return groups
 }
 
 export function GroceryList({ recipes }: GroceryListProps) {
@@ -63,6 +83,7 @@ export function GroceryList({ recipes }: GroceryListProps) {
   }
 
   const remaining = items.length - checked.size
+  const grouped = groupByDepartment(items)
 
   return (
     <Box>
@@ -73,51 +94,70 @@ export function GroceryList({ recipes }: GroceryListProps) {
         </Text>
       </Flex>
 
-      <Flex direction="column" gap="2">
-        {items.map((item) => {
-          const isChecked = checked.has(item.text)
+      <Flex direction="column" gap="4">
+        {DEPARTMENT_ORDER.filter((dept) => grouped.has(dept)).map((dept) => {
+          const deptItems = grouped.get(dept)!
+          const allChecked = deptItems.every((item) => checked.has(item.text.toLowerCase()))
+
           return (
-            <Flex
-              key={item.text}
-              align="start"
-              gap="2"
-              p="2"
-              style={{
-                borderRadius: 'var(--radius-2)',
-                backgroundColor: isChecked ? 'var(--gray-2)' : 'transparent',
-                cursor: 'pointer',
-              }}
-              onClick={() => toggle(item.text)}
-            >
-              <Checkbox
-                checked={isChecked}
-                onCheckedChange={() => toggle(item.text)}
-                mt="1"
-              />
+            <Box key={dept}>
+              <Heading
+                size="3"
+                mb="2"
+                style={{ opacity: allChecked ? 0.4 : 1 }}
+              >
+                {dept}
+              </Heading>
               <Flex direction="column" gap="1">
-                <Text
-                  size="2"
-                  style={{
-                    textDecoration: isChecked ? 'line-through' : 'none',
-                    opacity: isChecked ? 0.5 : 1,
-                  }}
-                >
-                  {item.text}
-                </Text>
-                {item.recipeTitles.length > 1 && (
-                  <Box>
-                    <Text size="1" color="gray">Used in:</Text>
-                    <ul style={{ margin: '2px 0 0 16px', padding: 0 }}>
-                      {item.recipeTitles.map((title) => (
-                        <li key={title}>
-                          <Text size="1" color="gray">{title}</Text>
-                        </li>
-                      ))}
-                    </ul>
-                  </Box>
-                )}
+                {deptItems.map((item) => {
+                  const key = item.text.toLowerCase()
+                  const isChecked = checked.has(key)
+                  return (
+                    <Flex
+                      key={key}
+                      align="start"
+                      gap="2"
+                      p="2"
+                      style={{
+                        borderRadius: 'var(--radius-2)',
+                        backgroundColor: isChecked ? 'var(--gray-2)' : 'transparent',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => toggle(key)}
+                    >
+                      <Checkbox
+                        checked={isChecked}
+                        onCheckedChange={() => toggle(key)}
+                        mt="1"
+                      />
+                      <Flex direction="column" gap="1">
+                        <Text
+                          size="2"
+                          style={{
+                            textDecoration: isChecked ? 'line-through' : 'none',
+                            opacity: isChecked ? 0.5 : 1,
+                          }}
+                        >
+                          {item.text}
+                        </Text>
+                        {item.recipeTitles.length > 1 && (
+                          <Box>
+                            <Text size="1" color="gray">Used in:</Text>
+                            <ul style={{ margin: '2px 0 0 16px', padding: 0 }}>
+                              {item.recipeTitles.map((title) => (
+                                <li key={title}>
+                                  <Text size="1" color="gray">{title}</Text>
+                                </li>
+                              ))}
+                            </ul>
+                          </Box>
+                        )}
+                      </Flex>
+                    </Flex>
+                  )
+                })}
               </Flex>
-            </Flex>
+            </Box>
           )
         })}
       </Flex>
