@@ -3,11 +3,22 @@ import type { Recipe, WeeklyMenu, UserPreferences } from '@/types/recipe';
 
 export async function addRecipe(recipe: Omit<Recipe, 'id' | 'dateAdded' | 'timesShown' | 'updatedAt' | 'syncStatus'>): Promise<string> {
   const existing = await db.recipes.where('url').equals(recipe.url).first();
-  if (existing) {
+  if (existing && !existing.deletedAt) {
     throw new Error('A recipe with this URL already exists');
   }
-  const id = crypto.randomUUID();
   const now = Date.now();
+  if (existing && existing.deletedAt) {
+    await db.recipes.update(existing.id, {
+      ...recipe,
+      tags: recipe.tags ?? [],
+      updatedAt: now,
+      timesShown: 0,
+      deletedAt: undefined,
+      syncStatus: 'pending' as const,
+    });
+    return existing.id;
+  }
+  const id = crypto.randomUUID();
   await db.recipes.add({
     ...recipe,
     id,
