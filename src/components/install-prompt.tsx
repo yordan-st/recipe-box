@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Button, Callout, Flex, Text } from '@radix-ui/themes'
+import { Button, Flex, Text } from '@radix-ui/themes'
 import { DownloadIcon, Cross2Icon } from '@radix-ui/react-icons'
 
 interface BeforeInstallPromptEvent extends Event {
@@ -64,33 +64,52 @@ export function InstallPrompt() {
         right: 0,
         zIndex: 1000,
         padding: '12px 16px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
-      <Callout.Root>
-        <Callout.Icon>
+      <div
+        style={{
+          position: 'relative',
+          background: 'var(--color-surface)',
+          border: '1px solid var(--gray-6)',
+          borderRadius: 'var(--radius-3)',
+          padding: '12px 16px',
+          maxWidth: 480,
+          width: '100%',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <Button
+          size="1"
+          variant="ghost"
+          color="gray"
+          onClick={handleDismiss}
+          aria-label="Dismiss install prompt"
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+          }}
+        >
+          <Cross2Icon />
+        </Button>
+
+        <Flex align="center" gap="2" mb="2">
           <DownloadIcon />
-        </Callout.Icon>
-        <Flex align="center" gap="3" wrap="wrap" flexGrow="1">
-          <Callout.Text>
-            <Text weight="medium">Install Recipe Box</Text> for a faster,
-            app-like experience.
-          </Callout.Text>
-          <Flex gap="2" ml="auto">
-            <Button size="2" variant="solid" onClick={handleInstall}>
-              Install Recipe Box
-            </Button>
-            <Button
-              size="2"
-              variant="ghost"
-              color="gray"
-              onClick={handleDismiss}
-              aria-label="Dismiss install prompt"
-            >
-              <Cross2Icon />
-            </Button>
-          </Flex>
+          <Text size="2" weight="medium">
+            Install Recipe Box for a faster, app-like experience.
+          </Text>
         </Flex>
-      </Callout.Root>
+
+        <Flex justify="end">
+          <Button size="2" variant="solid" onClick={handleInstall}>
+            <DownloadIcon />
+            Install
+          </Button>
+        </Flex>
+      </div>
     </div>
   )
 }
