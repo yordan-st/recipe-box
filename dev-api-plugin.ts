@@ -1,6 +1,32 @@
 import type { Plugin } from 'vite';
 import * as cheerio from 'cheerio';
 
+function resolveUrl(maybeRelative: string | undefined, baseUrl: string): string | undefined {
+  if (!maybeRelative) return undefined;
+  try {
+    return new URL(maybeRelative, baseUrl).href;
+  } catch {
+    return undefined;
+  }
+}
+
+function extractImageUrl(img: unknown): string | undefined {
+  if (typeof img === 'string') return img;
+  if (Array.isArray(img)) {
+    for (const item of img) {
+      const url = extractImageUrl(item);
+      if (url) return url;
+    }
+    return undefined;
+  }
+  if (img && typeof img === 'object') {
+    const obj = img as Record<string, unknown>;
+    if (typeof obj.url === 'string') return obj.url;
+    if (typeof obj.contentUrl === 'string') return obj.contentUrl;
+  }
+  return undefined;
+}
+
 function findRecipeObjects(data: unknown): Record<string, unknown>[] {
   const results: Record<string, unknown>[] = [];
   if (Array.isArray(data)) {
@@ -92,7 +118,7 @@ export function devApiPlugin(): Plugin {
                 const recipe = recipes[0];
                 result.title = recipe.name as string;
                 const img = recipe.image;
-                result.imageUrl = Array.isArray(img) ? String(img[0]) : typeof img === 'string' ? img : undefined;
+                result.imageUrl = extractImageUrl(img);
                 if (Array.isArray(recipe.recipeIngredient)) {
                   result.ingredients = recipe.recipeIngredient.map(String);
                 }
@@ -110,7 +136,7 @@ export function devApiPlugin(): Plugin {
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             title: result.title,
-            imageUrl: result.imageUrl,
+            imageUrl: resolveUrl(result.imageUrl, url),
             ingredients: result.ingredients ?? [],
             source: result.source,
           }));

@@ -36,7 +36,15 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
 
   function validate(): boolean {
     const newErrors: { url?: string; title?: string } = {}
-    if (!url.trim()) newErrors.url = 'URL is required'
+    if (!url.trim()) {
+      newErrors.url = 'URL is required'
+    } else {
+      try {
+        new URL(url.trim())
+      } catch {
+        newErrors.url = 'Please enter a valid URL'
+      }
+    }
     if (!title.trim()) newErrors.title = 'Title is required'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0

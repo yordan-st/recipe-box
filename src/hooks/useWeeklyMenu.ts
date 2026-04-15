@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db/schema';
 import type { Recipe, WeeklyMenu } from '@/types/recipe';
 import {
-  saveWeeklyMenu,
+  replaceWeeklyMenu,
   getCurrentWeeklyMenu,
   markRecipesShown,
   getAllRecipes,
@@ -39,7 +39,7 @@ export function useWeeklyMenu() {
     const selected = selectWeeklyMenu(allRecipes);
     const recipeIds = selected.map((r) => r.id);
 
-    await saveWeeklyMenu({
+    await replaceWeeklyMenu({
       weekStart,
       recipeIds,
       generatedAt: Date.now(),
