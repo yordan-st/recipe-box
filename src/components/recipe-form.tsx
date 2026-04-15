@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
-import { Flex, Button, Text, Box, TextField, TextArea, Callout } from '@radix-ui/themes'
+import { Flex, Button, Text, Box, TextField, TextArea } from '@radix-ui/themes'
+import { toast } from 'sonner'
 import { Cross2Icon, MagicWandIcon, UpdateIcon } from '@radix-ui/react-icons'
 import type { Recipe } from '@/types/recipe'
 
@@ -30,7 +31,6 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
 
   const [errors, setErrors] = useState<{ url?: string; title?: string }>({})
   const [isFetching, setIsFetching] = useState(false)
-  const [fetchStatus, setFetchStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const isEditing = initialData !== undefined
 
@@ -64,7 +64,6 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
     }
 
     setIsFetching(true)
-    setFetchStatus(null)
     setErrors({})
 
     try {
@@ -80,10 +79,7 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
 
       if (!response.ok) {
         const data = await response.json()
-        setFetchStatus({
-          type: 'error',
-          message: data.error || 'Failed to fetch recipe data. Fill in details manually.',
-        })
+        toast.error(data.error || 'Failed to fetch recipe data. Fill in details manually.')
         return
       }
 
@@ -95,22 +91,13 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
       if (data.ingredients && data.ingredients.length > 0) {
         setIngredientsText(data.ingredients.join('\n'))
         setIngredientsSource('auto')
-        setFetchStatus({
-          type: 'success',
-          message: `Fetched ${data.ingredients.length} ingredients via ${data.source}`,
-        })
+        toast.success(`Fetched ${data.ingredients.length} ingredients via ${data.source}`)
       } else {
         setIngredientsSource('manual')
-        setFetchStatus({
-          type: 'success',
-          message: `Fetched title and image via ${data.source}. No ingredients found — enter them manually.`,
-        })
+        toast.success(`Fetched title and image via ${data.source}. No ingredients found — enter them manually.`)
       }
     } catch {
-      setFetchStatus({
-        type: 'error',
-        message: 'Could not reach the server. Fill in details manually.',
-      })
+      toast.error('Could not reach the server. Fill in details manually.')
     } finally {
       setIsFetching(false)
     }
@@ -168,12 +155,6 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
             )}
           </Flex>
         </Box>
-
-        {fetchStatus && (
-          <Callout.Root color={fetchStatus.type === 'success' ? 'green' : 'red'} size="1">
-            <Callout.Text>{fetchStatus.message}</Callout.Text>
-          </Callout.Root>
-        )}
 
         <Box>
           <Text as="label" size="2" weight="medium" mb="1" htmlFor="recipe-title">

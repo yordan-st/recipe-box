@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -5,11 +6,21 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
-import { Theme, Flex, Container } from "@radix-ui/themes";
+import { Theme, Flex, Container, IconButton } from "@radix-ui/themes";
+import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
+import { Toaster } from "sonner";
 import { InstallPrompt } from "@/components/install-prompt";
 import { RecipesListPage } from "@/pages/recipes-list";
 import { AddRecipePage } from "@/pages/add-recipe";
 import { WeeklyViewPage } from "@/pages/weekly-view";
+
+function getInitialAppearance(): "light" | "dark" {
+  const stored = localStorage.getItem("theme-appearance");
+  if (stored === "light" || stored === "dark") return stored;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}
 
 function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   const location = useLocation();
@@ -22,7 +33,13 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   );
 }
 
-function AppLayout() {
+function AppLayout({
+  appearance,
+  toggleAppearance,
+}: {
+  appearance: "light" | "dark";
+  toggleAppearance: () => void;
+}) {
   return (
     <Flex direction="column" style={{ minHeight: "100vh" }}>
       <nav>
@@ -35,10 +52,18 @@ function AppLayout() {
             >
               Recipe Box
             </Link>
-            <Flex gap="3" ml="auto">
+            <Flex gap="3" ml="auto" align="center">
               <NavLink to="/">Recipes</NavLink>
               <NavLink to="/add">Add</NavLink>
               <NavLink to="/weekly">Menu</NavLink>
+              <IconButton
+                size="2"
+                variant="ghost"
+                onClick={toggleAppearance}
+                aria-label="Toggle dark mode"
+              >
+                {appearance === "dark" ? <SunIcon /> : <MoonIcon />}
+              </IconButton>
             </Flex>
           </Flex>
         </Container>
@@ -56,11 +81,42 @@ function AppLayout() {
 }
 
 function App() {
+  const [appearance, setAppearance] = useState<"light" | "dark">(
+    getInitialAppearance
+  );
+
+  const toggleAppearance = useCallback(() => {
+    setAppearance((prev) => {
+      const next = prev === "light" ? "dark" : "light";
+      localStorage.setItem("theme-appearance", next);
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      meta.setAttribute(
+        "content",
+        appearance === "dark" ? "#1c1c1e" : "#e07a3a"
+      );
+    }
+  }, [appearance]);
+
   return (
     <BrowserRouter>
-      <Theme accentColor="orange" radius="medium" scaling="100%">
-        <AppLayout />
+      <Theme
+        accentColor="orange"
+        appearance={appearance}
+        radius="medium"
+        scaling="100%"
+      >
+        <AppLayout
+          appearance={appearance}
+          toggleAppearance={toggleAppearance}
+        />
         <InstallPrompt />
+        <Toaster richColors position="bottom-right" theme={appearance} />
       </Theme>
     </BrowserRouter>
   );

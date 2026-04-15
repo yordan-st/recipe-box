@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Button, Dialog, Flex, Grid, Heading, Text } from '@radix-ui/themes';
-import { PlusIcon } from '@radix-ui/react-icons';
+import { AlertDialog, Box, Button, Dialog, Flex, Grid, Heading, Text, TextField } from '@radix-ui/themes';
+import { MagnifyingGlassIcon, PlusIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
 import { useRecipes } from '@/hooks/useRecipes';
 import { RecipeCard } from '@/components/recipe-card';
 import { RecipeForm } from '@/components/recipe-form';
@@ -10,9 +11,18 @@ import type { Recipe } from '@/types/recipe';
 export function RecipesListPage() {
   const { recipes, recipeCount, isLoading, deleteRecipe, updateRecipe } = useRecipes();
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+  const [deletingRecipe, setDeletingRecipe] = useState<Recipe | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const handleDelete = async (id: string) => {
-    await deleteRecipe(id);
+  const filteredRecipes = searchQuery.trim()
+    ? recipes.filter((r) => r.title.toLowerCase().includes(searchQuery.trim().toLowerCase()))
+    : recipes;
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingRecipe) return;
+    await deleteRecipe(deletingRecipe.id);
+    toast.success('Recipe deleted');
+    setDeletingRecipe(null);
   };
 
   const handleEditSubmit = async (data: Omit<Recipe, 'id' | 'dateAdded' | 'timesShown'>) => {
@@ -34,7 +44,9 @@ export function RecipesListPage() {
       <Flex justify="between" align="center" mb="4">
         <Flex align="center" gap="2">
           <Heading size="6">My Recipes</Heading>
-          <Text size="2" color="gray">({recipeCount})</Text>
+          <Text size="2" color="gray">
+            ({searchQuery.trim() ? `${filteredRecipes.length} of ${recipeCount}` : recipeCount})
+          </Text>
         </Flex>
         <Button asChild>
           <Link to="/add">
@@ -42,6 +54,21 @@ export function RecipesListPage() {
           </Link>
         </Button>
       </Flex>
+
+      {recipes.length > 0 && (
+        <Box mb="4">
+          <TextField.Root
+            placeholder="Search recipes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            size="2"
+          >
+            <TextField.Slot>
+              <MagnifyingGlassIcon height="16" width="16" />
+            </TextField.Slot>
+          </TextField.Root>
+        </Box>
+      )}
 
       {recipes.length === 0 ? (
         <Flex direction="column" align="center" gap="4" py="8">
@@ -52,16 +79,20 @@ export function RecipesListPage() {
             </Link>
           </Button>
         </Flex>
+      ) : filteredRecipes.length === 0 ? (
+        <Flex direction="column" align="center" gap="2" py="8">
+          <Text size="3" color="gray">No recipes match "{searchQuery}"</Text>
+        </Flex>
       ) : (
         <Grid
           gap="4"
           style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}
         >
-          {recipes.map((recipe) => (
+          {filteredRecipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}
               recipe={recipe}
-              onDelete={() => handleDelete(recipe.id)}
+              onDelete={() => setDeletingRecipe(recipe)}
               onEdit={() => setEditingRecipe(recipe)}
             />
           ))}
@@ -80,6 +111,23 @@ export function RecipesListPage() {
           )}
         </Dialog.Content>
       </Dialog.Root>
+
+      <AlertDialog.Root open={deletingRecipe !== null} onOpenChange={(open) => { if (!open) setDeletingRecipe(null); }}>
+        <AlertDialog.Content maxWidth="450px">
+          <AlertDialog.Title>Delete Recipe</AlertDialog.Title>
+          <AlertDialog.Description size="2">
+            Are you sure you want to delete "{deletingRecipe?.title}"? This action cannot be undone.
+          </AlertDialog.Description>
+          <Flex gap="3" mt="4" justify="end">
+            <AlertDialog.Cancel>
+              <Button variant="soft" color="gray">Cancel</Button>
+            </AlertDialog.Cancel>
+            <AlertDialog.Action>
+              <Button variant="solid" color="red" onClick={handleDeleteConfirm}>Delete</Button>
+            </AlertDialog.Action>
+          </Flex>
+        </AlertDialog.Content>
+      </AlertDialog.Root>
     </Box>
   );
 }

@@ -22,14 +22,14 @@ body,
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     sans-serif;
-  background-color: #fdf6f0;
+  background-color: var(--color-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 /* Navigation */
 nav {
-  background: white;
+  background: var(--color-surface);
   border-bottom: 1px solid var(--gray-5);
   position: sticky;
   top: 0;
@@ -61,7 +61,7 @@ nav {
 }
 
 .rt-Card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--black-a3);
   transform: translateY(-1px);
 }
 
