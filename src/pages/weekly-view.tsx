@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Heading, Text, Button, Flex, Box, Grid, Separator } from '@radix-ui/themes';
 import { ReloadIcon } from '@radix-ui/react-icons';
 import { RecipeCard } from '@/components/recipe-card';
+import { GroceryList } from '@/components/grocery-list';
 import { useWeeklyMenu } from '@/hooks/useWeeklyMenu';
 import { useRecipes } from '@/hooks/useRecipes';
 import type { Recipe } from '@/types/recipe';
@@ -82,12 +83,7 @@ export function WeeklyViewPage() {
 
           <Separator size="4" mb="4" />
 
-          <Flex direction="column" gap="2">
-            <Heading size="4">Grocery List</Heading>
-            <Text size="2" color="gray">
-              Coming soon — your combined grocery list will appear here.
-            </Text>
-          </Flex>
+          <GroceryList recipes={menu} />
         </>
       )}
     </Box>
