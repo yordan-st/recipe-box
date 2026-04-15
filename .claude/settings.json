@@ -18,7 +18,11 @@
       "Bash(echo \"EXIT: $?\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5174/add)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5174/weekly)",
-      "Bash(curl -s http://localhost:5173/manifest.json)"
+      "Bash(curl -s http://localhost:5173/manifest.json)",
+      "Bash(node -e ' *)",
+      "Bash(gh auth *)",
+      "Bash(gh repo *)",
+      "Bash(git push *)"
     ]
   }
 }

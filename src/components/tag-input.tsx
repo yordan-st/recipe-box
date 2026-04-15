@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Badge, Box, Flex, TextField, Text } from '@radix-ui/themes'
 import { Cross2Icon } from '@radix-ui/react-icons'
+import { tagColor } from '@/lib/tag-colors'
 
 const SUGGESTIONS = [
   'italian', 'asian', 'mexican', 'quick', 'vegetarian',
@@ -47,6 +48,7 @@ export function TagInput({ tags, onChange }: TagInputProps) {
               key={tag}
               variant="soft"
               size="2"
+              color={tagColor(tag)}
               style={{ cursor: 'pointer' }}
               onClick={() => removeTag(tag)}
             >

@@ -1,13 +1,6 @@
 import { Card, Flex, Text, Heading, Badge, Box, Button, IconButton } from '@radix-ui/themes'
-
-const TAG_COLORS = ['orange', 'blue', 'green', 'purple', 'cyan', 'crimson', 'teal', 'plum'] as const
-
-function tagColor(tag: string) {
-  let hash = 0
-  for (const ch of tag) hash = ((hash << 5) - hash + ch.charCodeAt(0)) | 0
-  return TAG_COLORS[Math.abs(hash) % TAG_COLORS.length]
-}
 import { TrashIcon, Pencil1Icon, ExternalLinkIcon, CalendarIcon } from '@radix-ui/react-icons'
+import { tagColor } from '@/lib/tag-colors'
 import type { Recipe } from '@/types/recipe'
 
 interface RecipeCardProps {
@@ -152,7 +145,8 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
               {onSwapToMenu && (
                 <IconButton
                   size="2"
-                  variant="ghost"
+                  variant="soft"
+                  color="green"
                   onClick={() => onSwapToMenu(recipe)}
                   aria-label="Add to menu"
                 >
