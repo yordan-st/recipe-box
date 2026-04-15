@@ -105,9 +105,16 @@ export function GroceryList({ recipes }: GroceryListProps) {
                   {item.text}
                 </Text>
                 {item.recipeTitles.length > 1 && (
-                  <Text size="1" color="gray">
-                    Used in: {item.recipeTitles.join(', ')}
-                  </Text>
+                  <Box>
+                    <Text size="1" color="gray">Used in:</Text>
+                    <ul style={{ margin: '2px 0 0 16px', padding: 0 }}>
+                      {item.recipeTitles.map((title) => (
+                        <li key={title}>
+                          <Text size="1" color="gray">{title}</Text>
+                        </li>
+                      ))}
+                    </ul>
+                  </Box>
                 )}
               </Flex>
             </Flex>

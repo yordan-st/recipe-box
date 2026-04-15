@@ -12,6 +12,11 @@ export class RecipeBoxDB extends Dexie {
       recipes: 'id, url, dateAdded, lastShown',
       weeklyMenus: 'id, weekStart',
     });
+
+    this.version(2).stores({
+      recipes: 'id, &url, dateAdded, lastShown',  // & = unique index on url
+      weeklyMenus: 'id, weekStart',
+    });
   }
 }
 

@@ -8,6 +8,32 @@ interface RecipeMetadata {
   source: 'json-ld' | 'opengraph' | 'fallback';
 }
 
+function resolveUrl(maybeRelative: string | undefined, baseUrl: string): string | undefined {
+  if (!maybeRelative) return undefined;
+  try {
+    return new URL(maybeRelative, baseUrl).href;
+  } catch {
+    return undefined;
+  }
+}
+
+function extractImageUrl(img: unknown): string | undefined {
+  if (typeof img === 'string') return img;
+  if (Array.isArray(img)) {
+    for (const item of img) {
+      const url = extractImageUrl(item);
+      if (url) return url;
+    }
+    return undefined;
+  }
+  if (img && typeof img === 'object') {
+    const obj = img as Record<string, unknown>;
+    if (typeof obj.url === 'string') return obj.url;
+    if (typeof obj.contentUrl === 'string') return obj.contentUrl;
+  }
+  return undefined;
+}
+
 function extractJsonLd($: cheerio.CheerioAPI): Partial<RecipeMetadata> | null {
   const scripts = $('script[type="application/ld+json"]');
   const result: Partial<RecipeMetadata> = {};
@@ -22,12 +48,7 @@ function extractJsonLd($: cheerio.CheerioAPI): Partial<RecipeMetadata> | null {
 
       const recipe = recipes[0];
       result.title = (recipe.name as string) || undefined;
-      const img = recipe.image;
-      result.imageUrl = Array.isArray(img)
-        ? String(img[0])
-        : typeof img === 'object' && img !== null && 'url' in (img as Record<string, unknown>)
-          ? String((img as Record<string, unknown>).url)
-          : typeof img === 'string' ? img : undefined;
+      result.imageUrl = extractImageUrl(recipe.image);
 
       if (recipe.recipeIngredient && Array.isArray(recipe.recipeIngredient)) {
         result.ingredients = recipe.recipeIngredient.map(String);
@@ -147,7 +168,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (jsonLd?.title) {
       return res.status(200).json({
         title: jsonLd.title,
-        imageUrl: jsonLd.imageUrl,
+        imageUrl: resolveUrl(jsonLd.imageUrl, url),
         ingredients: jsonLd.ingredients ?? [],
         source: jsonLd.source,
       });
@@ -158,7 +179,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (og?.title) {
       return res.status(200).json({
         title: og.title,
-        imageUrl: og.imageUrl,
+        imageUrl: resolveUrl(og.imageUrl, url),
         ingredients: [],
         source: og.source,
       });
@@ -168,7 +189,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const fallback = extractFallback($);
     return res.status(200).json({
       title: fallback.title,
-      imageUrl: fallback.imageUrl,
+      imageUrl: resolveUrl(fallback.imageUrl, url),
       ingredients: [],
       source: fallback.source,
     });
