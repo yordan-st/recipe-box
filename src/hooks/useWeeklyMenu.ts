@@ -12,9 +12,11 @@ import {
   getWeekStartTimestamp,
 } from '@/lib/algorithms/weekly-selection';
 import { useCallback } from 'react';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 
 export function useWeeklyMenu() {
   const weekStart = getWeekStartTimestamp();
+  const { preferences } = useUserPreferences();
 
   const currentWeekMenu = useLiveQuery(async () => {
     const menu = await getCurrentWeeklyMenu();
@@ -31,12 +33,12 @@ export function useWeeklyMenu() {
     const recipes = await Promise.all(
       currentWeekMenu.recipeIds.map((id) => db.recipes.get(id)),
     );
-    return recipes.filter((r): r is Recipe => r !== undefined);
+    return recipes.filter((r): r is Recipe => r !== undefined && !r.deletedAt);
   }, [currentWeekMenu]) as Recipe[] | null | undefined;
 
   const generateMenu = useCallback(async () => {
     const allRecipes = await getAllRecipes();
-    const selected = selectWeeklyMenu(allRecipes);
+    const selected = selectWeeklyMenu(allRecipes, preferences.menuSize);
     const recipeIds = selected.map((r) => r.id);
 
     await replaceWeeklyMenu({
@@ -47,7 +49,7 @@ export function useWeeklyMenu() {
     });
 
     await markRecipesShown(recipeIds);
-  }, [weekStart]);
+  }, [weekStart, preferences.menuSize]);
 
   const isLoading = currentWeekMenu === undefined || menu === undefined;
 
@@ -56,5 +58,6 @@ export function useWeeklyMenu() {
     isLoading,
     generateMenu,
     currentWeekMenu: currentWeekMenu ?? null,
+    menuSize: preferences.menuSize,
   };
 }
