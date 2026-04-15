@@ -1,84 +1,84 @@
-import { useState, useEffect } from 'react'
-import { Button, Flex, Text } from '@radix-ui/themes'
-import { DownloadIcon, Cross2Icon } from '@radix-ui/react-icons'
+import { useState, useEffect } from "react";
+import { Button, Flex, Text } from "@radix-ui/themes";
+import { DownloadIcon, Cross2Icon } from "@radix-ui/react-icons";
 
 interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-const DISMISS_KEY = 'install-prompt-dismissed'
-const DISMISS_DURATION_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
+const DISMISS_KEY = "install-prompt-dismissed";
+const DISMISS_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function isDismissed(): boolean {
-  const raw = localStorage.getItem(DISMISS_KEY)
-  if (!raw) return false
-  const dismissedAt = Number(raw)
-  if (Date.now() - dismissedAt < DISMISS_DURATION_MS) return true
-  localStorage.removeItem(DISMISS_KEY)
-  return false
+  const raw = localStorage.getItem(DISMISS_KEY);
+  if (!raw) return false;
+  const dismissedAt = Number(raw);
+  if (Date.now() - dismissedAt < DISMISS_DURATION_MS) return true;
+  localStorage.removeItem(DISMISS_KEY);
+  return false;
 }
 
 export function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null)
-  const [visible, setVisible] = useState(false)
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (isDismissed()) return
+    if (isDismissed()) return;
 
     const handler = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
-      setVisible(true)
-    }
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      setVisible(true);
+    };
 
-    window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
-  }, [])
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return
-    await deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
-    if (outcome === 'accepted') {
-      setVisible(false)
+    if (!deferredPrompt) return;
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      setVisible(false);
     }
-    setDeferredPrompt(null)
-  }
+    setDeferredPrompt(null);
+  };
 
   const handleDismiss = () => {
-    localStorage.setItem(DISMISS_KEY, String(Date.now()))
-    setVisible(false)
-    setDeferredPrompt(null)
-  }
+    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    setVisible(false);
+    setDeferredPrompt(null);
+  };
 
-  if (!visible) return null
+  if (!visible) return null;
 
   return (
     <div
       style={{
-        position: 'fixed',
+        position: "fixed",
         bottom: 0,
         left: 0,
         right: 0,
         zIndex: 1000,
-        padding: '12px 16px',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        padding: "12px 16px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <div
         style={{
-          position: 'relative',
-          background: 'var(--color-surface)',
-          border: '1px solid var(--gray-6)',
-          borderRadius: 'var(--radius-3)',
-          padding: '12px 16px',
+          position: "relative",
+          background: "var(--color-surface)",
+          border: "1px solid var(--gray-6)",
+          borderRadius: "var(--radius-3)",
+          padding: "20px 14px 10px 14px",
           maxWidth: 480,
-          width: '100%',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+          width: "100%",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
         }}
       >
         <Button
@@ -88,7 +88,7 @@ export function InstallPrompt() {
           onClick={handleDismiss}
           aria-label="Dismiss install prompt"
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 8,
             right: 8,
           }}
@@ -96,20 +96,19 @@ export function InstallPrompt() {
           <Cross2Icon />
         </Button>
 
-        <Flex align="center" gap="2" mb="2">
+        <Flex align="center" justify="center" gap="2" mb="2">
           <DownloadIcon />
           <Text size="2" weight="medium">
             Install Recipe Box for a faster, app-like experience.
           </Text>
         </Flex>
 
-        <Flex justify="end">
+        <Flex justify="center">
           <Button size="2" variant="solid" onClick={handleInstall}>
-            <DownloadIcon />
             Install
           </Button>
         </Flex>
       </div>
     </div>
-  )
+  );
 }
