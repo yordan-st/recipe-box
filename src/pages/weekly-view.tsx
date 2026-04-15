@@ -1,10 +1,9 @@
-import { Heading } from '@radix-ui/themes'
+import { Box, Heading } from '@radix-ui/themes';
 
 export function WeeklyViewPage() {
   return (
-    <div>
-      <Heading size="6" mb="4">Weekly Plan</Heading>
-      <p>Your weekly meal plan will appear here.</p>
-    </div>
-  )
+    <Box p="4">
+      <Heading size="6" mb="4">Weekly Plan - Coming Soon</Heading>
+    </Box>
+  );
 }
