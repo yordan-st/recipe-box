@@ -14,15 +14,19 @@ import {
 import { MagnifyingGlassIcon, PlusIcon } from "@radix-ui/react-icons";
 import { toast } from "sonner";
 import { useRecipes } from "@/hooks/useRecipes";
+import { useWeeklyMenu } from "@/hooks/useWeeklyMenu";
 import { RecipeCard } from "@/components/recipe-card";
 import { RecipeForm } from "@/components/recipe-form";
+import { SlotPickerDialog } from "@/components/slot-picker-dialog";
 import type { Recipe, RecipeFormData } from "@/types/recipe";
 
 export function RecipesListPage() {
   const { recipes, recipeCount, isLoading, deleteRecipe, updateRecipe } =
     useRecipes();
+  const { menu, setMenuSlot, menuSize } = useWeeklyMenu();
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [deletingRecipe, setDeletingRecipe] = useState<Recipe | null>(null);
+  const [swappingRecipe, setSwappingRecipe] = useState<Recipe | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredRecipes = searchQuery.trim()
@@ -122,6 +126,7 @@ export function RecipesListPage() {
               recipe={recipe}
               onDelete={() => setDeletingRecipe(recipe)}
               onEdit={() => setEditingRecipe(recipe)}
+              onSwapToMenu={() => setSwappingRecipe(recipe)}
             />
           ))}
         </Grid>
@@ -171,6 +176,19 @@ export function RecipesListPage() {
           </Flex>
         </AlertDialog.Content>
       </AlertDialog.Root>
+
+      <SlotPickerDialog
+        open={swappingRecipe !== null}
+        onClose={() => setSwappingRecipe(null)}
+        onSelectSlot={async (slotIndex) => {
+          if (!swappingRecipe) return;
+          await setMenuSlot(slotIndex, swappingRecipe.id);
+          toast.success(`Added "${swappingRecipe.title}" to menu slot ${slotIndex + 1}`);
+          setSwappingRecipe(null);
+        }}
+        menuRecipes={menu ?? []}
+        menuSize={menuSize}
+      />
     </Box>
   );
 }

@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heading, Text, Button, Flex, Box, Grid, Separator, Select } from '@radix-ui/themes';
-import { ReloadIcon } from '@radix-ui/react-icons';
-import { RecipeCard } from '@/components/recipe-card';
+import { ReloadIcon, PlusIcon } from '@radix-ui/react-icons';
+import { MenuSlot } from '@/components/menu-slot';
+import { RecipePickerDialog } from '@/components/recipe-picker-dialog';
 import { GroceryList } from '@/components/grocery-list';
 import { useWeeklyMenu } from '@/hooks/useWeeklyMenu';
 import { useRecipes } from '@/hooks/useRecipes';
@@ -29,9 +31,18 @@ function gridColumns(menuSize: number): Record<string, string> {
 }
 
 export function WeeklyViewPage() {
-  const { menu, isLoading: menuLoading, generateMenu, menuSize } = useWeeklyMenu();
+  const {
+    menu,
+    isLoading: menuLoading,
+    generateMenu,
+    setMenuSlot,
+    fillRemainingSlots,
+    menuSize,
+  } = useWeeklyMenu();
   const { recipeCount, isLoading: recipesLoading } = useRecipes();
   const { updatePreferences } = useUserPreferences();
+
+  const [swappingSlot, setSwappingSlot] = useState<number | null>(null);
 
   const isLoading = menuLoading || recipesLoading;
 
@@ -44,6 +55,19 @@ export function WeeklyViewPage() {
   }
 
   const hasEnoughRecipes = recipeCount >= menuSize;
+  const filledRecipes = menu?.filter((r): r is Recipe => r !== undefined) ?? [];
+  const hasEmptySlots = menu ? menu.some((r) => !r) : false;
+  const excludeIds = filledRecipes.map((r) => r.id);
+
+  const handleSwap = (slotIndex: number) => {
+    setSwappingSlot(slotIndex);
+  };
+
+  const handlePickRecipe = async (recipe: Recipe) => {
+    if (swappingSlot === null) return;
+    await setMenuSlot(swappingSlot, recipe.id);
+    setSwappingSlot(null);
+  };
 
   return (
     <Box p="4">
@@ -77,7 +101,7 @@ export function WeeklyViewPage() {
         </Flex>
       </Flex>
 
-      {!hasEnoughRecipes ? (
+      {!hasEnoughRecipes && !menu ? (
         <Flex direction="column" align="center" gap="4" py="8">
           <Text size="3" color="gray">
             Add at least {menuSize} recipe{menuSize !== 1 ? 's' : ''} to generate a weekly menu
@@ -86,7 +110,7 @@ export function WeeklyViewPage() {
             <Link to="/add">Add Recipes</Link>
           </Button>
         </Flex>
-      ) : !menu ? (
+      ) : !menu || filledRecipes.length === 0 ? (
         <Flex direction="column" align="center" gap="4" py="8">
           <Text size="3" color="gray">
             Generate your first weekly menu!
@@ -97,17 +121,38 @@ export function WeeklyViewPage() {
         </Flex>
       ) : (
         <>
-          <Grid columns={gridColumns(menuSize)} gap="4" mb="6">
-            {menu.map((recipe: Recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} compact />
+          <Grid columns={gridColumns(menuSize)} gap="4" mb="4">
+            {menu.map((recipe, index) => (
+              <MenuSlot
+                key={index}
+                recipe={recipe}
+                slotIndex={index}
+                onSwap={handleSwap}
+              />
             ))}
           </Grid>
 
+          {hasEmptySlots && hasEnoughRecipes && (
+            <Flex justify="center" mb="4">
+              <Button variant="soft" onClick={fillRemainingSlots}>
+                <PlusIcon /> Fill Empty Slots
+              </Button>
+            </Flex>
+          )}
+
           <Separator size="4" mb="4" />
 
-          <GroceryList recipes={menu} />
+          <GroceryList recipes={filledRecipes} />
         </>
       )}
+
+      <RecipePickerDialog
+        open={swappingSlot !== null}
+        onClose={() => setSwappingSlot(null)}
+        onSelect={handlePickRecipe}
+        excludeIds={excludeIds}
+        title={swappingSlot !== null && menu?.[swappingSlot] ? 'Swap Recipe' : 'Pick a Recipe'}
+      />
     </Box>
   );
 }

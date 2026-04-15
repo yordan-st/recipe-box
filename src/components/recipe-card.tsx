@@ -7,13 +7,14 @@ function tagColor(tag: string) {
   for (const ch of tag) hash = ((hash << 5) - hash + ch.charCodeAt(0)) | 0
   return TAG_COLORS[Math.abs(hash) % TAG_COLORS.length]
 }
-import { TrashIcon, Pencil1Icon, ExternalLinkIcon } from '@radix-ui/react-icons'
+import { TrashIcon, Pencil1Icon, ExternalLinkIcon, CalendarIcon } from '@radix-ui/react-icons'
 import type { Recipe } from '@/types/recipe'
 
 interface RecipeCardProps {
   recipe: Recipe
   onDelete?: (id: string) => void
   onEdit?: (recipe: Recipe) => void
+  onSwapToMenu?: (recipe: Recipe) => void
   compact?: boolean
 }
 
@@ -42,7 +43,7 @@ function RecipeInitials({ title }: { title: string }) {
   )
 }
 
-export function RecipeCard({ recipe, onDelete, onEdit, compact = false }: RecipeCardProps) {
+export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = false }: RecipeCardProps) {
   if (compact) {
     return (
       <Card size="1">
@@ -147,6 +148,16 @@ export function RecipeCard({ recipe, onDelete, onEdit, compact = false }: Recipe
             </Button>
 
             <Flex gap="1" ml="auto">
+              {onSwapToMenu && (
+                <IconButton
+                  size="2"
+                  variant="ghost"
+                  onClick={() => onSwapToMenu(recipe)}
+                  aria-label="Add to menu"
+                >
+                  <CalendarIcon />
+                </IconButton>
+              )}
               {onEdit && (
                 <IconButton
                   size="2"
