@@ -1,5 +1,5 @@
-import { Card, Flex, Text, Heading, Badge, Box, Button, IconButton } from '@radix-ui/themes'
-import { TrashIcon, Pencil1Icon, ExternalLinkIcon, CalendarIcon } from '@radix-ui/react-icons'
+import { Card, Flex, Text, Heading, Badge, Box, Button, IconButton, DropdownMenu } from '@radix-ui/themes'
+import { ExternalLinkIcon, CalendarIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { tagColor } from '@/lib/tag-colors'
 import type { Recipe } from '@/types/recipe'
 import { t } from '@/lib/i18n'
@@ -108,7 +108,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
       )}
       <Box p="3">
         <Flex direction="column" gap="2">
-          <Heading size="3" truncate>
+          <Heading size="3" style={{ lineHeight: 1.3 }}>
             {recipe.title}
           </Heading>
 
@@ -146,26 +146,26 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
                   <CalendarIcon />
                 </IconButton>
               )}
-              {onEdit && (
-                <IconButton
-                  size="2"
-                  variant="ghost"
-                  onClick={() => onEdit(recipe)}
-                  aria-label={t.editRecipe}
-                >
-                  <Pencil1Icon />
-                </IconButton>
-              )}
-              {onDelete && (
-                <IconButton
-                  size="2"
-                  variant="ghost"
-                  color="red"
-                  onClick={() => onDelete(recipe.id)}
-                  aria-label={t.deleteRecipe}
-                >
-                  <TrashIcon />
-                </IconButton>
+              {(onEdit || onDelete) && (
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger>
+                    <IconButton size="2" variant="ghost" color="gray">
+                      <DotsHorizontalIcon />
+                    </IconButton>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Content size="1">
+                    {onEdit && (
+                      <DropdownMenu.Item onClick={() => onEdit(recipe)}>
+                        {t.editRecipe}
+                      </DropdownMenu.Item>
+                    )}
+                    {onDelete && (
+                      <DropdownMenu.Item color="red" onClick={() => onDelete(recipe.id)}>
+                        {t.deleteRecipe}
+                      </DropdownMenu.Item>
+                    )}
+                  </DropdownMenu.Content>
+                </DropdownMenu.Root>
               )}
             </Flex>
           </Flex>

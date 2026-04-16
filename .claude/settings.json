@@ -22,7 +22,30 @@
       "Bash(node -e ' *)",
       "Bash(gh auth *)",
       "Bash(gh repo *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(curl -s -X POST http://localhost:5173/api/sync -H 'Content-Type: application/json' -d '{\"recipes\":[]}')",
+      "Bash(curl -s -X POST https://recipe-box-rouge.vercel.app/api/setup-db)",
+      "Bash(curl -s \"https://recipe-box-rouge.vercel.app/api/sync?since=0\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(gh pr create --title 'fix: menu sync and recipe count mismatch' --body ' *)",
+      "Bash(gh pr *)",
+      "Bash(git pull *)",
+      "Bash(git reset *)",
+      "Bash(curl -X POST https://recipe-box-rouge.vercel.app/api/setup-db)",
+      "Bash(curl -s https://recipe-box-rouge.vercel.app/api/sync?since=0)",
+      "Bash(npx vercel *)",
+      "Bash(curl -v \"https://recipe-box-rouge.vercel.app/api/sync?since=0\")",
+      "Bash(curl -s \"https://recipe-box-rouge.vercel.app/api/auth\")",
+      "Bash(curl -s \"https://recipe-box-rouge.vercel.app/api/fetch-recipe\" -X POST -H \"Content-Type: application/json\" -d '{\"url\":\"test\"}')",
+      "Bash(gh api *)",
+      "Bash(curl -s \"https://recipe-box-rouge.vercel.app/api/setup-db\" -X POST)",
+      "Bash(curl -s -H \"Cookie: auth_token=test\" \"https://recipe-box-rouge.vercel.app/api/sync?since=0\")",
+      "Bash(curl -s -X POST \"https://recipe-box-rouge.vercel.app/api/setup-db\")",
+      "Bash(curl -sI \"https://recipe-box-rouge.vercel.app/api/sync?since=0\")",
+      "Bash(curl -s \"https://recipe-8i03ohzw6-yordan-sts-projects.vercel.app/api/sync?since=0\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'recipes: {len\\(d[\\\\\"recipes\\\\\"]\\)}, menus: {len\\(d[\\\\\"weeklyMenus\\\\\"]\\)}, checklists: {len\\(d[\\\\\"groceryChecklists\\\\\"]\\)}, prefs: {\\\\\"customTags\\\\\" in \\(d.get\\(\\\\\"preferences\\\\\"\\) or {}\\)}'\\)\")",
+      "Bash(curl -s \"https://recipe-box-rouge.vercel.app/api/fetch-recipe\" -X POST -H \"Content-Type: application/json\" -d '{\"url\":\"https://example.com\"}')"
     ]
   }
 }
