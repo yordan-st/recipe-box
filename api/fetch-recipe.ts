@@ -120,36 +120,35 @@ function extractFallback($: cheerio.CheerioAPI): Partial<RecipeMetadata> {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin ?? '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (!verifyAuth(req)) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const { url } = req.body;
-
-  if (!url || typeof url !== 'string') {
-    return res.status(400).json({ error: 'URL is required' });
-  }
-
   try {
-    new URL(url);
-  } catch {
-    return res.status(400).json({ error: 'Invalid URL' });
-  }
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin ?? '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-  try {
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+
+    if (!verifyAuth(req)) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const { url } = req.body;
+
+    if (!url || typeof url !== 'string') {
+      return res.status(400).json({ error: 'URL is required' });
+    }
+
+    try {
+      new URL(url);
+    } catch {
+      return res.status(400).json({ error: 'Invalid URL' });
+    }
     const response = await fetch(url, {
       headers: {
         'User-Agent':
@@ -201,6 +200,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       source: fallback.source,
     });
   } catch (err) {
+    console.error('Fetch-recipe error:', err);
     const message = err instanceof Error ? err.message : 'Unknown error';
     return res.status(500).json({
       error: `Failed to scrape: ${message}`,
