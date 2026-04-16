@@ -4,19 +4,23 @@ import {
   markRecipesSynced,
   getPendingMenus,
   markMenusSynced,
+  getPendingGroceryChecklists,
+  markGroceryChecklistsSynced,
   upsertRecipeFromServer,
   upsertPreferencesFromServer,
   upsertWeeklyMenuFromServer,
+  upsertGroceryChecklistFromServer,
   getSyncMeta,
   updateSyncMeta,
   getUserPreferences,
 } from '@/lib/db/operations';
-import type { Recipe, UserPreferences, WeeklyMenu } from '@/types/recipe';
+import type { Recipe, UserPreferences, WeeklyMenu, GroceryChecklist } from '@/types/recipe';
 
 interface PullResponse {
   recipes: Array<Omit<Recipe, 'syncStatus'>>;
   preferences?: { id: string; menuSize: number; updatedAt: number };
   weeklyMenus: Array<Omit<WeeklyMenu, 'syncStatus'>>;
+  groceryChecklists: Array<Omit<GroceryChecklist, 'syncStatus'>>;
   serverTime: number;
 }
 
@@ -56,8 +60,9 @@ export async function pushChanges(): Promise<void> {
   const pendingRecipes = await getPendingRecipes();
   const prefs = await getUserPreferences();
   const pendingMenus = await getPendingMenus();
+  const pendingChecklists = await getPendingGroceryChecklists();
 
-  if (pendingRecipes.length === 0 && prefs.syncStatus !== 'pending' && pendingMenus.length === 0) return;
+  if (pendingRecipes.length === 0 && prefs.syncStatus !== 'pending' && pendingMenus.length === 0 && pendingChecklists.length === 0) return;
 
   const body: Record<string, unknown> = {};
 
@@ -72,6 +77,10 @@ export async function pushChanges(): Promise<void> {
 
   if (pendingMenus.length > 0) {
     body.weeklyMenus = pendingMenus.map(({ syncStatus: _, ...m }) => m);
+  }
+
+  if (pendingChecklists.length > 0) {
+    body.groceryChecklists = pendingChecklists.map(({ syncStatus: _, ...c }) => c);
   }
 
   const res = await fetch('/api/sync', {
@@ -95,6 +104,10 @@ export async function pushChanges(): Promise<void> {
 
   if (pendingMenus.length > 0) {
     await markMenusSynced(pendingMenus.map((m) => m.id));
+  }
+
+  if (pendingChecklists.length > 0) {
+    await markGroceryChecklistsSynced(pendingChecklists.map((c) => c.id));
   }
 
   await updateSyncMeta(data.serverTime);
@@ -121,6 +134,10 @@ export async function pullChanges(): Promise<void> {
 
   for (const menu of data.weeklyMenus) {
     await upsertWeeklyMenuFromServer({ ...menu, syncStatus: 'synced' });
+  }
+
+  for (const checklist of data.groceryChecklists ?? []) {
+    await upsertGroceryChecklistFromServer({ ...checklist, syncStatus: 'synced' });
   }
 
   await updateSyncMeta(data.serverTime);

@@ -1,10 +1,11 @@
 import Dexie, { type Table } from 'dexie';
-import type { Recipe, WeeklyMenu, UserPreferences, SyncMeta } from '@/types/recipe';
+import type { Recipe, WeeklyMenu, UserPreferences, GroceryChecklist, SyncMeta } from '@/types/recipe';
 
 export class RecipeBoxDB extends Dexie {
   recipes!: Table<Recipe, string>;
   weeklyMenus!: Table<WeeklyMenu, string>;
   userPreferences!: Table<UserPreferences, string>;
+  groceryChecklists!: Table<GroceryChecklist, string>;
   syncMeta!: Table<SyncMeta, string>;
 
   constructor() {
@@ -43,6 +44,14 @@ export class RecipeBoxDB extends Dexie {
         menu.updatedAt = menu.updatedAt ?? menu.generatedAt;
         menu.syncStatus = menu.syncStatus ?? 'pending';
       });
+    });
+
+    this.version(5).stores({
+      recipes: 'id, url, dateAdded, lastShown, updatedAt, syncStatus',
+      weeklyMenus: 'id, weekStart, updatedAt, syncStatus',
+      userPreferences: 'id',
+      groceryChecklists: 'id, weekStart, syncStatus',
+      syncMeta: 'id',
     });
   }
 }

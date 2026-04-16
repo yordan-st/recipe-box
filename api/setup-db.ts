@@ -45,6 +45,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       )
     `;
 
+    await sql`
+      CREATE TABLE IF NOT EXISTS grocery_checklists (
+        id TEXT PRIMARY KEY,
+        week_start BIGINT NOT NULL,
+        checked_items JSONB NOT NULL DEFAULT '[]',
+        updated_at BIGINT NOT NULL
+      )
+    `;
+
+    await sql`CREATE INDEX IF NOT EXISTS idx_grocery_checklists_week_start ON grocery_checklists(week_start)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_grocery_checklists_updated_at ON grocery_checklists(updated_at)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_recipes_updated_at ON recipes(updated_at)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_weekly_menus_week_start ON weekly_menus(week_start)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_weekly_menus_updated_at ON weekly_menus(updated_at)`;

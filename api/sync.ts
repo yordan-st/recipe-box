@@ -31,10 +31,18 @@ interface SyncWeeklyMenu {
   updatedAt: number;
 }
 
+interface SyncGroceryChecklist {
+  id: string;
+  weekStart: number;
+  checkedItems: string[];
+  updatedAt: number;
+}
+
 interface PushPayload {
   recipes?: SyncRecipe[];
   preferences?: SyncPreferences;
   weeklyMenus?: SyncWeeklyMenu[];
+  groceryChecklists?: SyncGroceryChecklist[];
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -106,18 +114,32 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
     updatedAt: Number(m.updated_at),
   }));
 
+  const { rows: checklistRows } = await sql`
+    SELECT id, week_start, checked_items, updated_at
+    FROM grocery_checklists WHERE updated_at > ${since}
+  `;
+
+  const groceryChecklists: SyncGroceryChecklist[] = checklistRows.map((c) => ({
+    id: c.id,
+    weekStart: Number(c.week_start),
+    checkedItems: c.checked_items,
+    updatedAt: Number(c.updated_at),
+  }));
+
   return res.status(200).json({
     recipes,
     preferences,
     weeklyMenus,
+    groceryChecklists,
     serverTime: Date.now(),
   });
 }
 
 async function handlePush(req: VercelRequest, res: VercelResponse) {
-  const { recipes, preferences, weeklyMenus } = req.body as PushPayload;
+  const { recipes, preferences, weeklyMenus, groceryChecklists } = req.body as PushPayload;
   let recipesUpserted = 0;
   let menusUpserted = 0;
+  let checklistsUpserted = 0;
 
   if (recipes && recipes.length > 0) {
     for (const r of recipes) {
@@ -191,10 +213,31 @@ async function handlePush(req: VercelRequest, res: VercelResponse) {
     }
   }
 
+  if (groceryChecklists && groceryChecklists.length > 0) {
+    for (const c of groceryChecklists) {
+      const { rows: existing } = await sql`
+        SELECT updated_at FROM grocery_checklists WHERE id = ${c.id}
+      `;
+
+      if (existing.length === 0 || Number(existing[0].updated_at) < c.updatedAt) {
+        await sql`
+          INSERT INTO grocery_checklists (id, week_start, checked_items, updated_at)
+          VALUES (${c.id}, ${c.weekStart}, ${JSON.stringify(c.checkedItems)}, ${c.updatedAt})
+          ON CONFLICT (id) DO UPDATE SET
+            week_start = EXCLUDED.week_start,
+            checked_items = EXCLUDED.checked_items,
+            updated_at = EXCLUDED.updated_at
+        `;
+        checklistsUpserted++;
+      }
+    }
+  }
+
   return res.status(200).json({
     success: true,
     recipesUpserted,
     menusUpserted,
+    checklistsUpserted,
     serverTime: Date.now(),
   });
 }
