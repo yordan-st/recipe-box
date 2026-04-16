@@ -48,18 +48,18 @@ interface PushPayload {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin ?? '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') return res.status(200).end();
-
-  if (!verifyAuth(req)) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
   try {
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin ?? '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    if (req.method === 'OPTIONS') return res.status(200).end();
+
+    if (!verifyAuth(req)) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     if (req.method === 'GET') return await handlePull(req, res);
     if (req.method === 'POST') return await handlePush(req, res);
     return res.status(405).json({ error: 'Method not allowed' });
