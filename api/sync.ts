@@ -1,6 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from '@vercel/postgres';
-import { verifyAuth } from './_lib/verify-auth';
+import { createHmac } from 'node:crypto';
+
+function verifyAuth(req: VercelRequest): boolean {
+  const password = process.env.AUTH_PASSWORD;
+  if (!password) return true;
+  const cookie = req.headers.cookie ?? '';
+  const match = cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
+  if (!match) return false;
+  const expected = createHmac('sha256', password).update(password).digest('hex');
+  return match[1] === expected;
+}
 
 interface SyncRecipe {
   id: string;

@@ -1,7 +1,24 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { verifyAuth, createAuthToken } from './_lib/verify-auth';
+import { createHmac } from 'node:crypto';
 
 const TOKEN_MAX_AGE = 60 * 60 * 24 * 90; // 90 days in seconds
+
+function createToken(password: string): string {
+  const secret = process.env.AUTH_PASSWORD ?? '';
+  return createHmac('sha256', secret).update(password).digest('hex');
+}
+
+function verifyAuth(req: VercelRequest): boolean {
+  const password = process.env.AUTH_PASSWORD;
+  if (!password) return true;
+
+  const cookie = req.headers.cookie ?? '';
+  const match = cookie.match(/(?:^|;\s*)auth_token=([^;]*)/);
+  if (!match) return false;
+
+  const expected = createToken(password);
+  return match[1] === expected;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin ?? '*');
@@ -28,7 +45,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ success: false, message: 'Wrong password' });
     }
 
-    const token = createAuthToken(password);
+    const token = createToken(password);
 
     res.setHeader('Set-Cookie', [
       `auth_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${TOKEN_MAX_AGE}; Secure`,
