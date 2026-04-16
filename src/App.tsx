@@ -11,7 +11,9 @@ import { SunIcon, MoonIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { InstallPrompt } from "@/components/install-prompt";
+import { LoginScreen } from "@/components/login-screen";
 import { SyncStatusIndicator } from "@/components/sync-status-indicator";
+import { useAuth } from "@/hooks/useAuth";
 import { startSyncScheduler } from "@/lib/sync/sync-scheduler";
 import { RecipesListPage } from "@/pages/recipes-list";
 import { AddRecipePage } from "@/pages/add-recipe";
@@ -119,13 +121,16 @@ function AppLayout({
 }
 
 function App() {
+  const { state: authState, login } = useAuth();
   const [appearance, setAppearance] = useState<"light" | "dark">(
     getInitialAppearance
   );
 
   useEffect(() => {
-    startSyncScheduler();
-  }, []);
+    if (authState === 'authenticated') {
+      startSyncScheduler();
+    }
+  }, [authState]);
 
   const toggleAppearance = useCallback(() => {
     setAppearance((prev) => {
@@ -144,6 +149,22 @@ function App() {
       );
     }
   }, [appearance]);
+
+  if (authState === 'loading') {
+    return (
+      <Theme accentColor="orange" appearance={appearance} radius="medium" scaling="100%">
+        <div />
+      </Theme>
+    );
+  }
+
+  if (authState === 'unauthenticated') {
+    return (
+      <Theme accentColor="orange" appearance={appearance} radius="medium" scaling="100%">
+        <LoginScreen onLogin={login} />
+      </Theme>
+    );
+  }
 
   return (
     <BrowserRouter>

@@ -86,6 +86,7 @@ export async function pushChanges(): Promise<void> {
   const res = await fetch('/api/sync', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(body),
   });
 
@@ -116,7 +117,7 @@ export async function pushChanges(): Promise<void> {
 export async function pullChanges(): Promise<void> {
   const { lastSyncedAt } = await getSyncMeta();
 
-  const res = await fetch(`/api/sync?since=${lastSyncedAt}`);
+  const res = await fetch(`/api/sync?since=${lastSyncedAt}`, { credentials: 'include' });
   if (!res.ok) throw new Error(`Pull failed: ${res.status}`);
 
   const data: PullResponse = await res.json();
