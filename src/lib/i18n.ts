@@ -127,4 +127,5 @@ export const t = {
 
   // Operations
   duplicateRecipeUrl: 'Een recept met deze URL bestaat al',
+  duplicateUrlWarning: 'Er bestaat al een recept met deze URL',
 } as const;
