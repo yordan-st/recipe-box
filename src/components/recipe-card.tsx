@@ -1,15 +1,29 @@
-import { Card, Flex, Text, Heading, Badge, Box, Button, IconButton, DropdownMenu } from '@radix-ui/themes'
-import { ExternalLinkIcon, CalendarIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
-import { tagColor } from '@/lib/tag-colors'
-import type { Recipe } from '@/types/recipe'
-import { t } from '@/lib/i18n'
+import {
+  Card,
+  Flex,
+  Text,
+  Heading,
+  Badge,
+  Box,
+  Button,
+  IconButton,
+  DropdownMenu,
+} from "@radix-ui/themes";
+import {
+  ExternalLinkIcon,
+  CalendarIcon,
+  DotsHorizontalIcon,
+} from "@radix-ui/react-icons";
+import { tagColor } from "@/lib/tag-colors";
+import type { Recipe } from "@/types/recipe";
+import { t } from "@/lib/i18n";
 
 interface RecipeCardProps {
-  recipe: Recipe
-  onDelete?: (id: string) => void
-  onEdit?: (recipe: Recipe) => void
-  onSwapToMenu?: (recipe: Recipe) => void
-  compact?: boolean
+  recipe: Recipe;
+  onDelete?: (id: string) => void;
+  onEdit?: (recipe: Recipe) => void;
+  onSwapToMenu?: (recipe: Recipe) => void;
+  compact?: boolean;
 }
 
 function RecipeInitials({ title }: { title: string }) {
@@ -17,27 +31,33 @@ function RecipeInitials({ title }: { title: string }) {
     .split(/\s+/)
     .slice(0, 2)
     .map((word) => word.charAt(0).toUpperCase())
-    .join('')
+    .join("");
 
   return (
     <Flex
       align="center"
       justify="center"
       style={{
-        width: '100%',
-        aspectRatio: '16 / 9',
-        backgroundColor: 'var(--accent-3)',
-        borderRadius: 'var(--radius-2) var(--radius-2) 0 0',
+        width: "100%",
+        aspectRatio: "16 / 9",
+        backgroundColor: "var(--accent-3)",
+        borderRadius: "var(--radius-2) var(--radius-2) 0 0",
       }}
     >
-      <Text size="6" weight="bold" style={{ color: 'var(--accent-9)' }}>
+      <Text size="6" weight="bold" style={{ color: "var(--accent-9)" }}>
         {initials}
       </Text>
     </Flex>
-  )
+  );
 }
 
-export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = false }: RecipeCardProps) {
+export function RecipeCard({
+  recipe,
+  onDelete,
+  onEdit,
+  onSwapToMenu,
+  compact = false,
+}: RecipeCardProps) {
   if (compact) {
     return (
       <Card size="1">
@@ -46,11 +66,11 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
             src={recipe.imageUrl}
             alt={recipe.title}
             style={{
-              width: '100%',
-              aspectRatio: '16 / 9',
-              objectFit: 'cover',
-              borderRadius: 'var(--radius-2) var(--radius-2) 0 0',
-              display: 'block',
+              width: "100%",
+              aspectRatio: "16 / 9",
+              objectFit: "cover",
+              borderRadius: "var(--radius-2) var(--radius-2) 0 0",
+              display: "block",
             }}
           />
         ) : (
@@ -80,13 +100,15 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
                 </Badge>
               ))}
               {recipe.tags.length > 2 && (
-                <Badge variant="soft" size="1" color="gray">+{recipe.tags.length - 2}</Badge>
+                <Badge variant="soft" size="1" color="gray">
+                  +{recipe.tags.length - 2}
+                </Badge>
               )}
             </Flex>
           )}
         </Box>
       </Card>
-    )
+    );
   }
 
   return (
@@ -96,11 +118,11 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
           src={recipe.imageUrl}
           alt={recipe.title}
           style={{
-            width: '100%',
-            aspectRatio: '16 / 9',
-            objectFit: 'cover',
-            borderRadius: 'var(--radius-2) var(--radius-2) 0 0',
-            display: 'block',
+            width: "100%",
+            aspectRatio: "16 / 9",
+            objectFit: "cover",
+            borderRadius: "var(--radius-2) var(--radius-2) 0 0",
+            display: "block",
           }}
         />
       ) : (
@@ -126,7 +148,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
             {t.ingredientsCount(recipe.ingredients.length)}
           </Text>
 
-          <Flex gap="2" mt="2" align="center">
+          <Flex gap="2" align="center">
             <Button variant="soft" size="2" asChild>
               <a href={recipe.url} target="_blank" rel="noopener noreferrer">
                 <ExternalLinkIcon />
@@ -134,7 +156,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
               </a>
             </Button>
 
-            <Flex gap="1" ml="auto">
+            <Flex gap="2" ml="auto" align="center">
               {onSwapToMenu && (
                 <IconButton
                   size="2"
@@ -160,7 +182,10 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
                       </DropdownMenu.Item>
                     )}
                     {onDelete && (
-                      <DropdownMenu.Item color="red" onClick={() => onDelete(recipe.id)}>
+                      <DropdownMenu.Item
+                        color="red"
+                        onClick={() => onDelete(recipe.id)}
+                      >
                         {t.deleteRecipe}
                       </DropdownMenu.Item>
                     )}
@@ -172,5 +197,5 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
         </Flex>
       </Box>
     </Card>
-  )
+  );
 }
