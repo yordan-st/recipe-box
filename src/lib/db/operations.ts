@@ -119,6 +119,7 @@ export async function getCurrentWeeklyMenu(): Promise<WeeklyMenu | undefined> {
 const DEFAULT_PREFERENCES: UserPreferences = {
   id: 'default',
   menuSize: 4,
+  customTags: [],
   updatedAt: Date.now(),
   syncStatus: 'pending',
 };

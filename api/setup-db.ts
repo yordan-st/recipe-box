@@ -58,6 +58,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     await sql`ALTER TABLE weekly_menus ADD COLUMN IF NOT EXISTS updated_at BIGINT NOT NULL DEFAULT 0`;
     await sql`UPDATE weekly_menus SET updated_at = generated_at WHERE updated_at = 0`;
 
+    // Migration: add custom_tags column to user_preferences
+    await sql`ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS custom_tags JSONB NOT NULL DEFAULT '[]'`;
+
     await sql`CREATE INDEX IF NOT EXISTS idx_grocery_checklists_week_start ON grocery_checklists(week_start)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_grocery_checklists_updated_at ON grocery_checklists(updated_at)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_recipes_updated_at ON recipes(updated_at)`;

@@ -20,6 +20,7 @@ interface SyncRecipe {
 interface SyncPreferences {
   id: string;
   menuSize: number;
+  customTags?: string[];
   updatedAt: number;
 }
 
@@ -93,7 +94,7 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
   }));
 
   const { rows: prefRows } = await sql`
-    SELECT id, menu_size, updated_at
+    SELECT id, menu_size, custom_tags, updated_at
     FROM user_preferences WHERE updated_at > ${since}
   `;
 
@@ -101,6 +102,7 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
     ? {
         id: prefRows[0].id,
         menuSize: prefRows[0].menu_size,
+        customTags: prefRows[0].custom_tags ?? [],
         updatedAt: Number(prefRows[0].updated_at),
       }
     : undefined;
@@ -187,10 +189,11 @@ async function handlePush(req: VercelRequest, res: VercelResponse) {
 
     if (existing.length === 0 || Number(existing[0].updated_at) < preferences.updatedAt) {
       await sql`
-        INSERT INTO user_preferences (id, menu_size, updated_at)
-        VALUES (${preferences.id}, ${preferences.menuSize}, ${preferences.updatedAt})
+        INSERT INTO user_preferences (id, menu_size, custom_tags, updated_at)
+        VALUES (${preferences.id}, ${preferences.menuSize}, ${JSON.stringify(preferences.customTags ?? [])}, ${preferences.updatedAt})
         ON CONFLICT (id) DO UPDATE SET
           menu_size = EXCLUDED.menu_size,
+          custom_tags = EXCLUDED.custom_tags,
           updated_at = EXCLUDED.updated_at
       `;
     }
