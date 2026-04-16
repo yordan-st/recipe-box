@@ -31,7 +31,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         week_start BIGINT NOT NULL,
         recipe_ids JSONB NOT NULL DEFAULT '[]',
         manual_slots JSONB NOT NULL DEFAULT '{}',
-        generated_at BIGINT NOT NULL
+        generated_at BIGINT NOT NULL,
+        updated_at BIGINT NOT NULL DEFAULT 0
       )
     `;
 
@@ -46,6 +47,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     await sql`CREATE INDEX IF NOT EXISTS idx_recipes_updated_at ON recipes(updated_at)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_weekly_menus_week_start ON weekly_menus(week_start)`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_weekly_menus_updated_at ON weekly_menus(updated_at)`;
+
+    // Migration: add updated_at column to existing weekly_menus table
+    await sql`ALTER TABLE weekly_menus ADD COLUMN IF NOT EXISTS updated_at BIGINT NOT NULL DEFAULT 0`;
+    await sql`UPDATE weekly_menus SET updated_at = generated_at WHERE updated_at = 0`;
 
     return res.status(200).json({ success: true, message: 'Database tables created' });
   } catch (error) {

@@ -20,6 +20,8 @@ export interface WeeklyMenu {
   recipeIds: string[];
   manualSlots: Record<number, string>;
   generatedAt: number;
+  updatedAt: number;
+  syncStatus: 'pending' | 'synced';
 }
 
 export interface UserPreferences {

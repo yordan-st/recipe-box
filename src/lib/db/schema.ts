@@ -32,6 +32,18 @@ export class RecipeBoxDB extends Dexie {
         recipe.syncStatus = recipe.syncStatus ?? 'pending';
       });
     });
+
+    this.version(4).stores({
+      recipes: 'id, url, dateAdded, lastShown, updatedAt, syncStatus',
+      weeklyMenus: 'id, weekStart, updatedAt, syncStatus',
+      userPreferences: 'id',
+      syncMeta: 'id',
+    }).upgrade(tx => {
+      return tx.table('weeklyMenus').toCollection().modify(menu => {
+        menu.updatedAt = menu.updatedAt ?? menu.generatedAt;
+        menu.syncStatus = menu.syncStatus ?? 'pending';
+      });
+    });
   }
 }
 
