@@ -38,6 +38,7 @@ export function WeeklyViewPage() {
     isLoading: menuLoading,
     generateMenu,
     setMenuSlot,
+    clearMenuSlot,
     fillRemainingSlots,
     menuSize,
   } = useWeeklyMenu();
@@ -133,6 +134,7 @@ export function WeeklyViewPage() {
                 recipe={recipe}
                 slotIndex={index}
                 onSwap={handleSwap}
+                onRemove={clearMenuSlot}
               />
             ))}
           </Grid>

@@ -91,6 +91,25 @@ export function useWeeklyMenu() {
     scheduleSyncAfterMutation();
   }, [currentWeekMenu, weekStart, preferences.menuSize]);
 
+  const clearMenuSlot = useCallback(async (slotIndex: number) => {
+    if (!currentWeekMenu) return;
+
+    const newRecipeIds = [...currentWeekMenu.recipeIds];
+    newRecipeIds[slotIndex] = '';
+
+    const newManualSlots = { ...(currentWeekMenu.manualSlots ?? {}) };
+    delete newManualSlots[slotIndex];
+
+    await replaceWeeklyMenu({
+      weekStart: currentWeekMenu.weekStart,
+      recipeIds: newRecipeIds,
+      manualSlots: newManualSlots,
+      generatedAt: currentWeekMenu.generatedAt,
+    });
+
+    scheduleSyncAfterMutation();
+  }, [currentWeekMenu]);
+
   const fillRemainingSlots = useCallback(async () => {
     const allRecipes = await getAllRecipes();
     const currentIds = currentWeekMenu?.recipeIds ?? [];
@@ -150,6 +169,7 @@ export function useWeeklyMenu() {
     isLoading,
     generateMenu,
     setMenuSlot,
+    clearMenuSlot,
     fillRemainingSlots,
     currentWeekMenu: currentWeekMenu ?? null,
     menuSize: preferences.menuSize,

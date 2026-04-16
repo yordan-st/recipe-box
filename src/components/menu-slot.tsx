@@ -1,14 +1,15 @@
 import { Card, Flex, Text, Box, IconButton, Heading } from '@radix-ui/themes'
-import { ShuffleIcon, ExternalLinkIcon, PlusIcon } from '@radix-ui/react-icons'
+import { ShuffleIcon, ExternalLinkIcon, PlusIcon, Cross1Icon } from '@radix-ui/react-icons'
 import type { Recipe } from '@/types/recipe'
 
 interface MenuSlotProps {
   recipe?: Recipe
   slotIndex: number
   onSwap: (slotIndex: number) => void
+  onRemove?: (slotIndex: number) => void
 }
 
-export function MenuSlot({ recipe, slotIndex, onSwap }: MenuSlotProps) {
+export function MenuSlot({ recipe, slotIndex, onSwap, onRemove }: MenuSlotProps) {
   if (!recipe) {
     return (
       <Card
@@ -83,6 +84,17 @@ export function MenuSlot({ recipe, slotIndex, onSwap }: MenuSlotProps) {
                 <ExternalLinkIcon />
               </a>
             </IconButton>
+            {onRemove && (
+              <IconButton
+                size="1"
+                variant="ghost"
+                color="red"
+                onClick={() => onRemove(slotIndex)}
+                aria-label="Remove recipe"
+              >
+                <Cross1Icon />
+              </IconButton>
+            )}
           </Flex>
         </Flex>
       </Box>
