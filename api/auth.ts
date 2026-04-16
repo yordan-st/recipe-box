@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import crypto from 'crypto';
+import { createHmac } from 'node:crypto';
 
 const TOKEN_MAX_AGE = 60 * 60 * 24 * 90; // 90 days in seconds
 
 function createToken(password: string): string {
   const secret = process.env.AUTH_PASSWORD ?? '';
-  return crypto.createHmac('sha256', secret).update(password).digest('hex');
+  return createHmac('sha256', secret).update(password).digest('hex');
 }
 
 export function verifyAuth(req: VercelRequest): boolean {
