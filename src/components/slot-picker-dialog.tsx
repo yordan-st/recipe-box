@@ -24,7 +24,7 @@ export function SlotPickerDialog({
 
   return (
     <Dialog.Root open={open} onOpenChange={(o) => { if (!o) onClose() }}>
-      <Dialog.Content maxWidth="400px">
+      <Dialog.Content maxWidth="400px" onOpenAutoFocus={(e) => e.preventDefault()}>
         <Dialog.Title>{t.addToMenuTitle}</Dialog.Title>
         <Dialog.Description size="2" mb="3">
           {t.pickSlotDescription}

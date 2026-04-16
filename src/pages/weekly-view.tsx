@@ -1,18 +1,28 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Heading, Text, Button, Flex, Box, Grid, Separator, Select, AlertDialog } from '@radix-ui/themes';
-import { ReloadIcon, PlusIcon, CheckCircledIcon } from '@radix-ui/react-icons';
-import { toast } from 'sonner';
-import { MenuSlot } from '@/components/menu-slot';
-import { SkeletonCard } from '@/components/skeleton-card';
-import { RecipePickerDialog } from '@/components/recipe-picker-dialog';
-import { GroceryList } from '@/components/grocery-list';
-import { useWeeklyMenu } from '@/hooks/useWeeklyMenu';
-import { getWeekStartTimestamp } from '@/lib/algorithms/weekly-selection';
-import { useRecipes } from '@/hooks/useRecipes';
-import { useUserPreferences } from '@/hooks/useUserPreferences';
-import type { Recipe } from '@/types/recipe';
-import { t } from '@/lib/i18n';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  Heading,
+  Text,
+  Button,
+  Flex,
+  Box,
+  Grid,
+  Separator,
+  Select,
+  AlertDialog,
+} from "@radix-ui/themes";
+import { ReloadIcon, PlusIcon, CheckCircledIcon } from "@radix-ui/react-icons";
+import { toast } from "sonner";
+import { MenuSlot } from "@/components/menu-slot";
+import { SkeletonCard } from "@/components/skeleton-card";
+import { RecipePickerDialog } from "@/components/recipe-picker-dialog";
+import { GroceryList } from "@/components/grocery-list";
+import { useWeeklyMenu } from "@/hooks/useWeeklyMenu";
+import { getWeekStartTimestamp } from "@/lib/algorithms/weekly-selection";
+import { useRecipes } from "@/hooks/useRecipes";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import type { Recipe } from "@/types/recipe";
+import { t } from "@/lib/i18n";
 
 function getWeekDateRange(): string {
   const now = new Date();
@@ -23,15 +33,15 @@ function getWeekDateRange(): string {
   sunday.setDate(monday.getDate() + 6);
 
   const fmt = (d: Date) =>
-    d.toLocaleDateString('nl-NL', { month: 'short', day: 'numeric' });
+    d.toLocaleDateString("nl-NL", { month: "short", day: "numeric" });
 
   return `${fmt(monday)} – ${fmt(sunday)}, ${sunday.getFullYear()}`;
 }
 
 function gridColumns(menuSize: number): Record<string, string> {
-  if (menuSize <= 2) return { initial: '1', sm: '2' };
-  if (menuSize <= 4) return { initial: '1', sm: '2' };
-  return { initial: '1', sm: '2', md: '3' };
+  if (menuSize <= 2) return { initial: "1", sm: "2" };
+  if (menuSize <= 4) return { initial: "1", sm: "2" };
+  return { initial: "1", sm: "2", md: "3" };
 }
 
 export function WeeklyViewPage() {
@@ -55,9 +65,13 @@ export function WeeklyViewPage() {
   if (isLoading) {
     return (
       <Box p="4">
-        <Heading size="6" mb="4">{t.thisWeeksMenu}</Heading>
-        <Grid columns={{ initial: '1', sm: '2' }} gap="4">
-          {Array.from({ length: menuSize }, (_, i) => <SkeletonCard key={i} compact />)}
+        <Heading size="6" mb="4">
+          {t.thisWeeksMenu}
+        </Heading>
+        <Grid columns={{ initial: "1", sm: "2" }} gap="4">
+          {Array.from({ length: menuSize }, (_, i) => (
+            <SkeletonCard key={i} compact />
+          ))}
         </Grid>
       </Box>
     );
@@ -83,14 +97,20 @@ export function WeeklyViewPage() {
       <Flex justify="between" align="center" mb="4" wrap="wrap" gap="3">
         <Flex direction="column" gap="1">
           <Heading size="6">{t.thisWeeksMenu}</Heading>
-          <Text size="2" color="gray">{getWeekDateRange()}</Text>
+          <Text size="2" color="gray">
+            {getWeekDateRange()}
+          </Text>
         </Flex>
         <Flex gap="3" align="center">
           <Flex align="center" gap="2">
-            <Text size="2" color="gray">{t.recipesLabel}</Text>
+            <Text size="2" color="gray">
+              {t.recipesLabel}
+            </Text>
             <Select.Root
               value={String(menuSize)}
-              onValueChange={(val) => updatePreferences({ menuSize: Number(val) })}
+              onValueChange={(val) =>
+                updatePreferences({ menuSize: Number(val) })
+              }
             >
               <Select.Trigger variant="soft" />
               <Select.Content>
@@ -112,7 +132,7 @@ export function WeeklyViewPage() {
 
       {!hasEnoughRecipes && !menu ? (
         <Flex direction="column" align="center" gap="4" py="8">
-          <Text size="3" color="gray">
+          <Text size="3" color="gray" align="center">
             {t.needMoreRecipes(menuSize)}
           </Text>
           <Button asChild>
@@ -152,7 +172,10 @@ export function WeeklyViewPage() {
 
           <Separator size="4" mb="4" />
 
-          <GroceryList recipes={filledRecipes} weekStart={getWeekStartTimestamp()} />
+          <GroceryList
+            recipes={filledRecipes}
+            weekStart={getWeekStartTimestamp()}
+          />
 
           {filledRecipes.length > 0 && (
             <>
@@ -171,7 +194,9 @@ export function WeeklyViewPage() {
                     </AlertDialog.Description>
                     <Flex gap="3" mt="4" justify="end">
                       <AlertDialog.Cancel>
-                        <Button variant="soft" color="gray">{t.cancel}</Button>
+                        <Button variant="soft" color="gray">
+                          {t.cancel}
+                        </Button>
                       </AlertDialog.Cancel>
                       <AlertDialog.Action>
                         <Button
@@ -199,7 +224,11 @@ export function WeeklyViewPage() {
         onClose={() => setSwappingSlot(null)}
         onSelect={handlePickRecipe}
         excludeIds={excludeIds}
-        title={swappingSlot !== null && menu?.[swappingSlot] ? t.swapRecipe : t.pickARecipe}
+        title={
+          swappingSlot !== null && menu?.[swappingSlot]
+            ? t.swapRecipe
+            : t.pickARecipe
+        }
       />
     </Box>
   );

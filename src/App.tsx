@@ -73,11 +73,11 @@ function AppLayout({
     <Flex direction="column" style={{ minHeight: "100vh" }}>
       <nav className="top-nav">
         <Container size="3">
-          <Flex gap="4" align="center" py="3" px="4">
+          <Flex gap="4" align="center" py="3" px={{ initial: "0", sm: "4" }}>
             <Link
               to="/"
               className="nav-link"
-              style={{ fontWeight: 600, fontSize: "1.1rem" }}
+              style={{ fontWeight: 600, fontSize: "1.1rem", padding: 0 }}
             >
               {t.appName}
             </Link>
@@ -113,7 +113,7 @@ function AppLayout({
         </Container>
       </nav>
 
-      <Container size="3" px="4" flexGrow="1" py="4" pb="6" className="main-content">
+      <Container size="3" px={{ initial: "5", sm: "4" }} flexGrow="1" py="4" pb="6" className="main-content">
         <ErrorBoundary>
           <Suspense fallback={<div />}>
             <Routes>

@@ -40,7 +40,7 @@ export function RecipePickerDialog({
 
   return (
     <Dialog.Root open={open} onOpenChange={(o) => { if (!o) onClose() }}>
-      <Dialog.Content maxWidth="500px">
+      <Dialog.Content maxWidth="500px" onOpenAutoFocus={(e) => e.preventDefault()}>
         <Dialog.Title>{title}</Dialog.Title>
 
         <Box mb="3">

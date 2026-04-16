@@ -43,7 +43,6 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               placeholder={t.loginPlaceholder}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoFocus
               style={{ width: '100%' }}
             />
             {error && (
