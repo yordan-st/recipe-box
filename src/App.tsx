@@ -71,7 +71,7 @@ function AppLayout({
 }) {
   return (
     <Flex direction="column" style={{ minHeight: "100vh" }}>
-      <nav>
+      <nav className="top-nav">
         <Container size="3">
           <Flex gap="4" align="center" py="3" px="4">
             <Link

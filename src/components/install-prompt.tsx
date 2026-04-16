@@ -73,7 +73,9 @@ export function InstallPrompt() {
       <div
         style={{
           position: "relative",
-          background: "var(--color-surface)",
+          background: "color-mix(in srgb, var(--color-surface) 80%, transparent)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
           border: "1px solid var(--gray-6)",
           borderRadius: "var(--radius-3)",
           padding: "20px 14px 10px 14px",

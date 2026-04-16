@@ -48,6 +48,10 @@ export function TagInput({ tags, onChange }: TagInputProps) {
   function handleDeleteSuggestion(e: React.MouseEvent, tag: string) {
     e.stopPropagation()
     removeCustomTag(tag)
+    // Also remove from current recipe if selected
+    if (tags.includes(tag)) {
+      onChange(tags.filter((t) => t !== tag))
+    }
   }
 
   const unusedSuggestions = allSuggestions.filter((s) => !tags.includes(s))
