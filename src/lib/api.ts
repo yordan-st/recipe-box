@@ -16,6 +16,7 @@ export async function fetchRecipeMetadata(
   const response = await fetch('/api/fetch-recipe', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify({ url }),
   });
 

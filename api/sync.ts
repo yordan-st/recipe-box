@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from '@vercel/postgres';
+import { verifyAuth } from './auth';
 
 interface SyncRecipe {
   id: string;
@@ -46,11 +47,16 @@ interface PushPayload {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin ?? '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  if (!verifyAuth(req)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
 
   try {
     if (req.method === 'GET') return await handlePull(req, res);
