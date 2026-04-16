@@ -155,6 +155,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'User-Agent':
           'Mozilla/5.0 (compatible; RecipeBox/1.0; +https://recipe-box.app)',
         Accept: 'text/html,application/xhtml+xml',
+        'Accept-Language': 'nl,nl-NL;q=0.9,en;q=0.8',
       },
       signal: AbortSignal.timeout(10000),
     });
