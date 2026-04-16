@@ -7,7 +7,13 @@ import {
   useLocation,
 } from "react-router-dom";
 import { Theme, Flex, Container, IconButton, Text } from "@radix-ui/themes";
-import { SunIcon, MoonIcon, ReaderIcon, PlusIcon, CalendarIcon } from "@radix-ui/react-icons";
+import {
+  SunIcon,
+  MoonIcon,
+  ReaderIcon,
+  PlusIcon,
+  CalendarIcon,
+} from "@radix-ui/react-icons";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { InstallPrompt } from "@/components/install-prompt";
@@ -16,9 +22,15 @@ import { SyncStatusIndicator } from "@/components/sync-status-indicator";
 import { useAuth } from "@/hooks/useAuth";
 import { startSyncScheduler } from "@/lib/sync/sync-scheduler";
 import { t } from "@/lib/i18n";
-const RecipesListPage = lazy(() => import("@/pages/recipes-list").then((m) => ({ default: m.RecipesListPage })));
-const AddRecipePage = lazy(() => import("@/pages/add-recipe").then((m) => ({ default: m.AddRecipePage })));
-const WeeklyViewPage = lazy(() => import("@/pages/weekly-view").then((m) => ({ default: m.WeeklyViewPage })));
+const RecipesListPage = lazy(() =>
+  import("@/pages/recipes-list").then((m) => ({ default: m.RecipesListPage })),
+);
+const AddRecipePage = lazy(() =>
+  import("@/pages/add-recipe").then((m) => ({ default: m.AddRecipePage })),
+);
+const WeeklyViewPage = lazy(() =>
+  import("@/pages/weekly-view").then((m) => ({ default: m.WeeklyViewPage })),
+);
 
 function getInitialAppearance(): "light" | "dark" {
   const stored = localStorage.getItem("theme-appearance");
@@ -42,9 +54,17 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
 function BottomNav() {
   const location = useLocation();
   const items = [
-    { to: '/', icon: <ReaderIcon width={20} height={20} />, label: t.navRecipes },
-    { to: '/add', icon: <PlusIcon width={20} height={20} />, label: t.navAdd },
-    { to: '/weekly', icon: <CalendarIcon width={20} height={20} />, label: t.navMenu },
+    {
+      to: "/",
+      icon: <ReaderIcon width={20} height={20} />,
+      label: t.navRecipes,
+    },
+    { to: "/add", icon: <PlusIcon width={20} height={20} />, label: t.navAdd },
+    {
+      to: "/weekly",
+      icon: <CalendarIcon width={20} height={20} />,
+      label: t.navMenu,
+    },
   ];
 
   return (
@@ -52,7 +72,11 @@ function BottomNav() {
       {items.map(({ to, icon, label }) => {
         const isActive = location.pathname === to;
         return (
-          <Link key={to} to={to} className={`bottom-nav-item${isActive ? ' bottom-nav-active' : ''}`}>
+          <Link
+            key={to}
+            to={to}
+            className={`bottom-nav-item${isActive ? " bottom-nav-active" : ""}`}
+          >
             {icon}
             <Text size="1">{label}</Text>
           </Link>
@@ -72,8 +96,8 @@ function AppLayout({
   return (
     <Flex direction="column" style={{ minHeight: "100vh" }}>
       <nav className="top-nav">
-        <Container size="3">
-          <Flex gap="4" align="center" py="3" px={{ initial: "0", sm: "4" }}>
+        <Container size="2">
+          <Flex gap="4" align="center" py="3" px="5">
             <Link
               to="/"
               className="nav-link"
@@ -113,7 +137,7 @@ function AppLayout({
         </Container>
       </nav>
 
-      <Container size="3" px={{ initial: "5", sm: "4" }} flexGrow="1" py="4" pb="6" className="main-content">
+      <Container size="2" flexGrow="1" py="4" pb="6" className="main-content">
         <ErrorBoundary>
           <Suspense fallback={<div />}>
             <Routes>
@@ -134,11 +158,11 @@ function AppLayout({
 function App() {
   const { state: authState, login } = useAuth();
   const [appearance, setAppearance] = useState<"light" | "dark">(
-    getInitialAppearance
+    getInitialAppearance,
   );
 
   useEffect(() => {
-    if (authState === 'authenticated') {
+    if (authState === "authenticated") {
       startSyncScheduler();
     }
   }, [authState]);
@@ -156,22 +180,32 @@ function App() {
     if (meta) {
       meta.setAttribute(
         "content",
-        appearance === "dark" ? "#1c1c1e" : "#e07a3a"
+        appearance === "dark" ? "#1c1c1e" : "#e07a3a",
       );
     }
   }, [appearance]);
 
-  if (authState === 'loading') {
+  if (authState === "loading") {
     return (
-      <Theme accentColor="orange" appearance={appearance} radius="medium" scaling="100%">
+      <Theme
+        accentColor="orange"
+        appearance={appearance}
+        radius="medium"
+        scaling="100%"
+      >
         <div />
       </Theme>
     );
   }
 
-  if (authState === 'unauthenticated') {
+  if (authState === "unauthenticated") {
     return (
-      <Theme accentColor="orange" appearance={appearance} radius="medium" scaling="100%">
+      <Theme
+        accentColor="orange"
+        appearance={appearance}
+        radius="medium"
+        scaling="100%"
+      >
         <LoginScreen onLogin={login} />
       </Theme>
     );
