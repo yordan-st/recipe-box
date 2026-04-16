@@ -28,6 +28,7 @@ interface SyncWeeklyMenu {
   recipeIds: string[];
   manualSlots: Record<number, string>;
   generatedAt: number;
+  updatedAt: number;
 }
 
 interface PushPayload {
@@ -91,8 +92,8 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
     : undefined;
 
   const { rows: menuRows } = await sql`
-    SELECT id, week_start, recipe_ids, manual_slots, generated_at
-    FROM weekly_menus WHERE generated_at > ${since}
+    SELECT id, week_start, recipe_ids, manual_slots, generated_at, updated_at
+    FROM weekly_menus WHERE updated_at > ${since}
     ORDER BY week_start DESC LIMIT 4
   `;
 
@@ -102,6 +103,7 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
     recipeIds: m.recipe_ids,
     manualSlots: m.manual_slots,
     generatedAt: Number(m.generated_at),
+    updatedAt: Number(m.updated_at),
   }));
 
   return res.status(200).json({
@@ -168,17 +170,24 @@ async function handlePush(req: VercelRequest, res: VercelResponse) {
 
   if (weeklyMenus && weeklyMenus.length > 0) {
     for (const m of weeklyMenus) {
-      await sql`
-        INSERT INTO weekly_menus (id, week_start, recipe_ids, manual_slots, generated_at)
-        VALUES (${m.id}, ${m.weekStart}, ${JSON.stringify(m.recipeIds)},
-                ${JSON.stringify(m.manualSlots)}, ${m.generatedAt})
-        ON CONFLICT (id) DO UPDATE SET
-          week_start = EXCLUDED.week_start,
-          recipe_ids = EXCLUDED.recipe_ids,
-          manual_slots = EXCLUDED.manual_slots,
-          generated_at = EXCLUDED.generated_at
+      const { rows: existing } = await sql`
+        SELECT updated_at FROM weekly_menus WHERE id = ${m.id}
       `;
-      menusUpserted++;
+
+      if (existing.length === 0 || Number(existing[0].updated_at) < m.updatedAt) {
+        await sql`
+          INSERT INTO weekly_menus (id, week_start, recipe_ids, manual_slots, generated_at, updated_at)
+          VALUES (${m.id}, ${m.weekStart}, ${JSON.stringify(m.recipeIds)},
+                  ${JSON.stringify(m.manualSlots)}, ${m.generatedAt}, ${m.updatedAt})
+          ON CONFLICT (id) DO UPDATE SET
+            week_start = EXCLUDED.week_start,
+            recipe_ids = EXCLUDED.recipe_ids,
+            manual_slots = EXCLUDED.manual_slots,
+            generated_at = EXCLUDED.generated_at,
+            updated_at = EXCLUDED.updated_at
+        `;
+        menusUpserted++;
+      }
     }
   }
 

@@ -82,20 +82,23 @@ export async function markRecipesShown(ids: string[]): Promise<void> {
   });
 }
 
-export async function saveWeeklyMenu(menu: Omit<WeeklyMenu, 'id'>): Promise<string> {
+export async function saveWeeklyMenu(menu: Omit<WeeklyMenu, 'id' | 'updatedAt' | 'syncStatus'>): Promise<string> {
   const id = crypto.randomUUID();
-  await db.weeklyMenus.add({ ...menu, id });
+  await db.weeklyMenus.add({ ...menu, id, updatedAt: Date.now(), syncStatus: 'pending' });
   return id;
 }
 
-export async function replaceWeeklyMenu(menu: Omit<WeeklyMenu, 'id'>): Promise<string> {
+export async function replaceWeeklyMenu(menu: Omit<WeeklyMenu, 'id' | 'updatedAt' | 'syncStatus'>): Promise<string> {
   const id = crypto.randomUUID();
+  const now = Date.now();
   await db.transaction('rw', db.weeklyMenus, async () => {
     await db.weeklyMenus.where('weekStart').equals(menu.weekStart).delete();
     await db.weeklyMenus.add({
       ...menu,
       manualSlots: menu.manualSlots ?? {},
       id,
+      updatedAt: now,
+      syncStatus: 'pending',
     });
   });
   return id;
@@ -144,14 +147,6 @@ export async function markRecipesSynced(ids: string[]): Promise<void> {
 export async function upsertRecipeFromServer(recipe: Recipe): Promise<void> {
   const local = await db.recipes.get(recipe.id);
   if (!local || local.updatedAt < recipe.updatedAt) {
-    // If no local record by ID, check for URL conflict from a different ID
-    if (!local) {
-      const byUrl = await db.recipes.where('url').equals(recipe.url).first();
-      if (byUrl && byUrl.id !== recipe.id) {
-        // Remove stale local record to avoid unique index conflict
-        await db.recipes.delete(byUrl.id);
-      }
-    }
     await db.recipes.put({ ...recipe, syncStatus: 'synced' });
   }
 }
@@ -165,9 +160,21 @@ export async function upsertPreferencesFromServer(prefs: UserPreferences): Promi
 
 export async function upsertWeeklyMenuFromServer(menu: WeeklyMenu): Promise<void> {
   const local = await db.weeklyMenus.get(menu.id);
-  if (!local) {
-    await db.weeklyMenus.put(menu);
+  if (!local || local.updatedAt < menu.updatedAt) {
+    await db.weeklyMenus.put({ ...menu, syncStatus: 'synced' });
   }
+}
+
+export async function getPendingMenus(): Promise<WeeklyMenu[]> {
+  return db.weeklyMenus.where('syncStatus').equals('pending').toArray();
+}
+
+export async function markMenusSynced(ids: string[]): Promise<void> {
+  await db.transaction('rw', db.weeklyMenus, async () => {
+    for (const id of ids) {
+      await db.weeklyMenus.update(id, { syncStatus: 'synced' as const });
+    }
+  });
 }
 
 export async function getSyncMeta(): Promise<{ lastSyncedAt: number }> {

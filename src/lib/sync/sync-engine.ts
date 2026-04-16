@@ -2,20 +2,21 @@ import { db } from '@/lib/db/schema';
 import {
   getPendingRecipes,
   markRecipesSynced,
+  getPendingMenus,
+  markMenusSynced,
   upsertRecipeFromServer,
   upsertPreferencesFromServer,
   upsertWeeklyMenuFromServer,
   getSyncMeta,
   updateSyncMeta,
   getUserPreferences,
-  getCurrentWeeklyMenus,
 } from '@/lib/db/operations';
 import type { Recipe, UserPreferences, WeeklyMenu } from '@/types/recipe';
 
 interface PullResponse {
   recipes: Array<Omit<Recipe, 'syncStatus'>>;
   preferences?: { id: string; menuSize: number; updatedAt: number };
-  weeklyMenus: Array<WeeklyMenu>;
+  weeklyMenus: Array<Omit<WeeklyMenu, 'syncStatus'>>;
   serverTime: number;
 }
 
@@ -54,9 +55,9 @@ function setState(state: SyncState, detail?: string) {
 export async function pushChanges(): Promise<void> {
   const pendingRecipes = await getPendingRecipes();
   const prefs = await getUserPreferences();
-  const menus = await getCurrentWeeklyMenus();
+  const pendingMenus = await getPendingMenus();
 
-  if (pendingRecipes.length === 0 && prefs.syncStatus !== 'pending') return;
+  if (pendingRecipes.length === 0 && prefs.syncStatus !== 'pending' && pendingMenus.length === 0) return;
 
   const body: Record<string, unknown> = {};
 
@@ -69,8 +70,8 @@ export async function pushChanges(): Promise<void> {
     body.preferences = p;
   }
 
-  if (menus.length > 0) {
-    body.weeklyMenus = menus;
+  if (pendingMenus.length > 0) {
+    body.weeklyMenus = pendingMenus.map(({ syncStatus: _, ...m }) => m);
   }
 
   const res = await fetch('/api/sync', {
@@ -90,6 +91,10 @@ export async function pushChanges(): Promise<void> {
 
   if (prefs.syncStatus === 'pending') {
     await db.userPreferences.update('default', { syncStatus: 'synced' as const });
+  }
+
+  if (pendingMenus.length > 0) {
+    await markMenusSynced(pendingMenus.map((m) => m.id));
   }
 
   await updateSyncMeta(data.serverTime);
@@ -115,7 +120,7 @@ export async function pullChanges(): Promise<void> {
   }
 
   for (const menu of data.weeklyMenus) {
-    await upsertWeeklyMenuFromServer(menu);
+    await upsertWeeklyMenuFromServer({ ...menu, syncStatus: 'synced' });
   }
 
   await updateSyncMeta(data.serverTime);
