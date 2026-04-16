@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as cheerio from 'cheerio';
-import { verifyAuth } from './auth';
+import { verifyAuth } from './_lib/verify-auth';
 
 interface RecipeMetadata {
   title: string;
