@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -16,9 +16,9 @@ import { SyncStatusIndicator } from "@/components/sync-status-indicator";
 import { useAuth } from "@/hooks/useAuth";
 import { startSyncScheduler } from "@/lib/sync/sync-scheduler";
 import { t } from "@/lib/i18n";
-import { RecipesListPage } from "@/pages/recipes-list";
-import { AddRecipePage } from "@/pages/add-recipe";
-import { WeeklyViewPage } from "@/pages/weekly-view";
+const RecipesListPage = lazy(() => import("@/pages/recipes-list").then((m) => ({ default: m.RecipesListPage })));
+const AddRecipePage = lazy(() => import("@/pages/add-recipe").then((m) => ({ default: m.AddRecipePage })));
+const WeeklyViewPage = lazy(() => import("@/pages/weekly-view").then((m) => ({ default: m.WeeklyViewPage })));
 
 function getInitialAppearance(): "light" | "dark" {
   const stored = localStorage.getItem("theme-appearance");
@@ -115,11 +115,13 @@ function AppLayout({
 
       <Container size="3" px="4" flexGrow="1" py="4" pb="6" className="main-content">
         <ErrorBoundary>
-          <Routes>
-            <Route path="/" element={<RecipesListPage />} />
-            <Route path="/add" element={<AddRecipePage />} />
-            <Route path="/weekly" element={<WeeklyViewPage />} />
-          </Routes>
+          <Suspense fallback={<div />}>
+            <Routes>
+              <Route path="/" element={<RecipesListPage />} />
+              <Route path="/add" element={<AddRecipePage />} />
+              <Route path="/weekly" element={<WeeklyViewPage />} />
+            </Routes>
+          </Suspense>
         </ErrorBoundary>
       </Container>
 
