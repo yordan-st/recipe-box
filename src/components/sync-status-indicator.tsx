@@ -2,15 +2,16 @@ import { Tooltip, IconButton } from '@radix-ui/themes';
 import { CheckCircledIcon, CrossCircledIcon, UpdateIcon } from '@radix-ui/react-icons';
 import { useSyncStatus } from '@/hooks/useSyncStatus';
 import { fullSync } from '@/lib/sync/sync-engine';
+import { t } from '@/lib/i18n';
 
 export function SyncStatusIndicator() {
   const { state, lastError } = useSyncStatus();
 
   const label =
-    state === 'syncing' ? 'Syncing...' :
-    state === 'error' ? `Sync error: ${lastError}` :
-    state === 'offline' ? 'Offline' :
-    'Synced';
+    state === 'syncing' ? t.syncing :
+    state === 'error' ? t.syncError(lastError ?? '') :
+    state === 'offline' ? t.offline :
+    t.synced;
 
   const color =
     state === 'error' ? 'red' as const :

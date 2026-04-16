@@ -4,7 +4,7 @@ import type { Recipe, WeeklyMenu, UserPreferences, GroceryChecklist } from '@/ty
 export async function addRecipe(recipe: Omit<Recipe, 'id' | 'dateAdded' | 'timesShown' | 'updatedAt' | 'syncStatus'>): Promise<string> {
   const existing = await db.recipes.where('url').equals(recipe.url).first();
   if (existing && !existing.deletedAt) {
-    throw new Error('A recipe with this URL already exists');
+    throw new Error('Een recept met deze URL bestaat al');
   }
   const now = Date.now();
   if (existing && existing.deletedAt) {

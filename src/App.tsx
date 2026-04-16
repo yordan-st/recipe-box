@@ -15,6 +15,7 @@ import { LoginScreen } from "@/components/login-screen";
 import { SyncStatusIndicator } from "@/components/sync-status-indicator";
 import { useAuth } from "@/hooks/useAuth";
 import { startSyncScheduler } from "@/lib/sync/sync-scheduler";
+import { t } from "@/lib/i18n";
 import { RecipesListPage } from "@/pages/recipes-list";
 import { AddRecipePage } from "@/pages/add-recipe";
 import { WeeklyViewPage } from "@/pages/weekly-view";
@@ -55,19 +56,19 @@ function AppLayout({
               className="nav-link"
               style={{ fontWeight: 600, fontSize: "1.1rem" }}
             >
-              Recipe Box
+              {t.appName}
             </Link>
             {/* Desktop nav */}
             <Flex gap="3" ml="auto" align="center" className="nav-desktop">
-              <NavLink to="/">Recipes</NavLink>
-              <NavLink to="/add">Add</NavLink>
-              <NavLink to="/weekly">Menu</NavLink>
+              <NavLink to="/">{t.navRecipes}</NavLink>
+              <NavLink to="/add">{t.navAdd}</NavLink>
+              <NavLink to="/weekly">{t.navMenu}</NavLink>
               <SyncStatusIndicator />
               <IconButton
                 size="2"
                 variant="ghost"
                 onClick={toggleAppearance}
-                aria-label="Toggle dark mode"
+                aria-label={t.toggleDarkMode}
               >
                 {appearance === "dark" ? <SunIcon /> : <MoonIcon />}
               </IconButton>
@@ -80,25 +81,25 @@ function AppLayout({
                 size="2"
                 variant="ghost"
                 onClick={toggleAppearance}
-                aria-label="Toggle dark mode"
+                aria-label={t.toggleDarkMode}
               >
                 {appearance === "dark" ? <SunIcon /> : <MoonIcon />}
               </IconButton>
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
-                  <IconButton size="2" variant="ghost" aria-label="Menu">
+                  <IconButton size="2" variant="ghost" aria-label={t.menuAriaLabel}>
                     <HamburgerMenuIcon />
                   </IconButton>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
                   <DropdownMenu.Item asChild>
-                    <Link to="/" className="nav-dropdown-link">Recipes</Link>
+                    <Link to="/" className="nav-dropdown-link">{t.navRecipes}</Link>
                   </DropdownMenu.Item>
                   <DropdownMenu.Item asChild>
-                    <Link to="/add" className="nav-dropdown-link">Add Recipe</Link>
+                    <Link to="/add" className="nav-dropdown-link">{t.navAdd}</Link>
                   </DropdownMenu.Item>
                   <DropdownMenu.Item asChild>
-                    <Link to="/weekly" className="nav-dropdown-link">Weekly Menu</Link>
+                    <Link to="/weekly" className="nav-dropdown-link">{t.navMenu}</Link>
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Root>

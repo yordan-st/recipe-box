@@ -1,5 +1,6 @@
 import { Dialog, Flex, Text, Button, Box } from '@radix-ui/themes'
 import type { Recipe } from '@/types/recipe'
+import { t } from '@/lib/i18n'
 
 interface SlotPickerDialogProps {
   open: boolean
@@ -24,9 +25,9 @@ export function SlotPickerDialog({
   return (
     <Dialog.Root open={open} onOpenChange={(o) => { if (!o) onClose() }}>
       <Dialog.Content maxWidth="400px">
-        <Dialog.Title>Add to Menu</Dialog.Title>
+        <Dialog.Title>{t.addToMenuTitle}</Dialog.Title>
         <Dialog.Description size="2" mb="3">
-          Pick a slot to place this recipe in.
+          {t.pickSlotDescription}
         </Dialog.Description>
 
         <Flex direction="column" gap="2">
@@ -45,7 +46,7 @@ export function SlotPickerDialog({
                 <Text size="2" weight="bold">{index + 1}</Text>
               </Box>
               <Text size="2" truncate>
-                {recipe ? recipe.title : 'Empty slot'}
+                {recipe ? recipe.title : t.emptySlot}
               </Text>
             </Button>
           ))}
@@ -53,7 +54,7 @@ export function SlotPickerDialog({
 
         <Flex justify="end" mt="3">
           <Button variant="soft" color="gray" onClick={onClose}>
-            Cancel
+            {t.cancel}
           </Button>
         </Flex>
       </Dialog.Content>

@@ -4,6 +4,7 @@ import { MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db/schema'
 import type { Recipe } from '@/types/recipe'
+import { t } from '@/lib/i18n'
 
 interface RecipePickerDialogProps {
   open: boolean
@@ -18,7 +19,7 @@ export function RecipePickerDialog({
   onClose,
   onSelect,
   excludeIds = [],
-  title = 'Pick a Recipe',
+  title = t.pickARecipe,
 }: RecipePickerDialogProps) {
   const [search, setSearch] = useState('')
 
@@ -33,7 +34,7 @@ export function RecipePickerDialog({
     const q = search.trim().toLowerCase()
     return (
       r.title.toLowerCase().includes(q) ||
-      r.tags?.some((t) => t.toLowerCase().includes(q))
+      r.tags?.some((tag) => tag.toLowerCase().includes(q))
     )
   })
 
@@ -44,7 +45,7 @@ export function RecipePickerDialog({
 
         <Box mb="3">
           <TextField.Root
-            placeholder="Search by title or tag..."
+            placeholder={t.searchByTitleOrTag}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             size="2"
@@ -59,7 +60,7 @@ export function RecipePickerDialog({
           <Flex direction="column" gap="2">
             {filtered.length === 0 ? (
               <Text size="2" color="gray" align="center" style={{ padding: '16px 0' }}>
-                No recipes available
+                {t.noRecipesAvailable}
               </Text>
             ) : (
               filtered.map((recipe) => (
@@ -111,7 +112,7 @@ export function RecipePickerDialog({
                       {recipe.title}
                     </Text>
                     <Text size="1" color="gray">
-                      {recipe.ingredients.length} ingredients
+                      {t.ingredientsCount(recipe.ingredients.length)}
                       {recipe.tags?.length ? ` · ${recipe.tags.join(', ')}` : ''}
                     </Text>
                   </Flex>
@@ -123,7 +124,7 @@ export function RecipePickerDialog({
 
         <Flex justify="end" mt="3">
           <Button variant="soft" color="gray" onClick={onClose}>
-            Cancel
+            {t.cancel}
           </Button>
         </Flex>
       </Dialog.Content>

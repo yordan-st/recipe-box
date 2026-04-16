@@ -11,6 +11,7 @@ import { getWeekStartTimestamp } from '@/lib/algorithms/weekly-selection';
 import { useRecipes } from '@/hooks/useRecipes';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import type { Recipe } from '@/types/recipe';
+import { t } from '@/lib/i18n';
 
 function getWeekDateRange(): string {
   const now = new Date();
@@ -21,7 +22,7 @@ function getWeekDateRange(): string {
   sunday.setDate(monday.getDate() + 6);
 
   const fmt = (d: Date) =>
-    d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    d.toLocaleDateString('nl-NL', { month: 'short', day: 'numeric' });
 
   return `${fmt(monday)} – ${fmt(sunday)}, ${sunday.getFullYear()}`;
 }
@@ -52,7 +53,7 @@ export function WeeklyViewPage() {
   if (isLoading) {
     return (
       <Box p="4">
-        <Heading size="6" mb="4">This Week's Menu</Heading>
+        <Heading size="6" mb="4">{t.thisWeeksMenu}</Heading>
         <Grid columns={{ initial: '1', sm: '2' }} gap="4">
           {Array.from({ length: menuSize }, (_, i) => <SkeletonCard key={i} compact />)}
         </Grid>
@@ -79,12 +80,12 @@ export function WeeklyViewPage() {
     <Box p="4">
       <Flex justify="between" align="center" mb="4" wrap="wrap" gap="3">
         <Flex direction="column" gap="1">
-          <Heading size="6">This Week's Menu</Heading>
+          <Heading size="6">{t.thisWeeksMenu}</Heading>
           <Text size="2" color="gray">{getWeekDateRange()}</Text>
         </Flex>
         <Flex gap="3" align="center">
           <Flex align="center" gap="2">
-            <Text size="2" color="gray">Recipes:</Text>
+            <Text size="2" color="gray">{t.recipesLabel}</Text>
             <Select.Root
               value={String(menuSize)}
               onValueChange={(val) => updatePreferences({ menuSize: Number(val) })}
@@ -101,7 +102,7 @@ export function WeeklyViewPage() {
           </Flex>
           {hasEnoughRecipes && (
             <Button onClick={generateMenu}>
-              <ReloadIcon /> Generate
+              <ReloadIcon /> {t.generate}
             </Button>
           )}
         </Flex>
@@ -110,19 +111,19 @@ export function WeeklyViewPage() {
       {!hasEnoughRecipes && !menu ? (
         <Flex direction="column" align="center" gap="4" py="8">
           <Text size="3" color="gray">
-            Add at least {menuSize} recipe{menuSize !== 1 ? 's' : ''} to generate a weekly menu
+            {t.needMoreRecipes(menuSize)}
           </Text>
           <Button asChild>
-            <Link to="/add">Add Recipes</Link>
+            <Link to="/add">{t.addRecipes}</Link>
           </Button>
         </Flex>
       ) : !menu || filledRecipes.length === 0 ? (
         <Flex direction="column" align="center" gap="4" py="8">
           <Text size="3" color="gray">
-            Generate your first weekly menu!
+            {t.generateFirstMenu}
           </Text>
           <Button onClick={generateMenu}>
-            <ReloadIcon /> Generate Menu
+            <ReloadIcon /> {t.generateMenu}
           </Button>
         </Flex>
       ) : (
@@ -142,7 +143,7 @@ export function WeeklyViewPage() {
           {hasEmptySlots && hasEnoughRecipes && (
             <Flex justify="center" mb="4">
               <Button variant="soft" onClick={fillRemainingSlots}>
-                <PlusIcon /> Fill Empty Slots
+                <PlusIcon /> {t.fillEmptySlots}
               </Button>
             </Flex>
           )}
@@ -158,7 +159,7 @@ export function WeeklyViewPage() {
         onClose={() => setSwappingSlot(null)}
         onSelect={handlePickRecipe}
         excludeIds={excludeIds}
-        title={swappingSlot !== null && menu?.[swappingSlot] ? 'Swap Recipe' : 'Pick a Recipe'}
+        title={swappingSlot !== null && menu?.[swappingSlot] ? t.swapRecipe : t.pickARecipe}
       />
     </Box>
   );
