@@ -3,6 +3,7 @@ import { Flex, Button, Text, Box, TextField, TextArea } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { Cross2Icon, MagicWandIcon, UpdateIcon } from '@radix-ui/react-icons'
 import { TagInput } from '@/components/tag-input'
+import { getRecipeByUrl } from '@/lib/db/operations'
 import type { RecipeFormData } from '@/types/recipe'
 import { t } from '@/lib/i18n'
 
@@ -35,7 +36,24 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
   const [errors, setErrors] = useState<{ url?: string; title?: string }>({})
   const [isFetching, setIsFetching] = useState(false)
 
+  const [duplicateWarning, setDuplicateWarning] = useState(false)
+
   const isEditing = initialData !== undefined
+
+  const checkDuplicate = useCallback(async (urlStr: string) => {
+    const trimmed = urlStr.trim()
+    if (!trimmed || isEditing) {
+      setDuplicateWarning(false)
+      return
+    }
+    try {
+      new URL(trimmed)
+      const existing = await getRecipeByUrl(trimmed)
+      setDuplicateWarning(!!existing)
+    } catch {
+      setDuplicateWarning(false)
+    }
+  }, [isEditing])
 
   function validate(): boolean {
     const newErrors: { url?: string; title?: string } = {}
@@ -49,6 +67,7 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
       }
     }
     if (!title.trim()) newErrors.title = t.titleRequired
+    if (duplicateWarning) newErrors.url = t.duplicateUrlWarning
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -135,11 +154,20 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
                 id="recipe-url"
                 placeholder={t.placeholderUrl}
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onChange={(e) => {
+                  setUrl(e.target.value)
+                  setDuplicateWarning(false)
+                }}
+                onBlur={() => checkDuplicate(url)}
               />
               {errors.url && (
                 <Text size="1" color="red" mt="1">
                   {errors.url}
+                </Text>
+              )}
+              {duplicateWarning && !errors.url && (
+                <Text size="1" color="orange" mt="1">
+                  {t.duplicateUrlWarning}
                 </Text>
               )}
             </Box>
