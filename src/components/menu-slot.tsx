@@ -1,6 +1,7 @@
 import { Card, Flex, Text, Box, IconButton, Heading } from '@radix-ui/themes'
 import { ShuffleIcon, ExternalLinkIcon, PlusIcon, Cross1Icon } from '@radix-ui/react-icons'
 import type { Recipe } from '@/types/recipe'
+import { t } from '@/lib/i18n'
 
 interface MenuSlotProps {
   recipe?: Recipe
@@ -25,7 +26,7 @@ export function MenuSlot({ recipe, slotIndex, onSwap, onRemove }: MenuSlotProps)
           style={{ aspectRatio: '16 / 9' }}
         >
           <PlusIcon width={24} height={24} style={{ color: 'var(--gray-8)' }} />
-          <Text size="2" color="gray">Pick a recipe</Text>
+          <Text size="2" color="gray">{t.pickRecipeSlot}</Text>
         </Flex>
       </Card>
     )
@@ -75,12 +76,12 @@ export function MenuSlot({ recipe, slotIndex, onSwap, onRemove }: MenuSlotProps)
               size="1"
               variant="ghost"
               onClick={() => onSwap(slotIndex)}
-              aria-label="Swap recipe"
+              aria-label={t.swapRecipeAriaLabel}
             >
               <ShuffleIcon />
             </IconButton>
             <IconButton size="1" variant="ghost" asChild>
-              <a href={recipe.url} target="_blank" rel="noopener noreferrer" aria-label="Open recipe">
+              <a href={recipe.url} target="_blank" rel="noopener noreferrer" aria-label={t.openRecipe}>
                 <ExternalLinkIcon />
               </a>
             </IconButton>
@@ -90,7 +91,7 @@ export function MenuSlot({ recipe, slotIndex, onSwap, onRemove }: MenuSlotProps)
                 variant="ghost"
                 color="red"
                 onClick={() => onRemove(slotIndex)}
-                aria-label="Remove recipe"
+                aria-label={t.removeRecipeAriaLabel}
               >
                 <Cross1Icon />
               </IconButton>

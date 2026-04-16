@@ -2,6 +2,7 @@ import { Card, Flex, Text, Heading, Badge, Box, Button, IconButton } from '@radi
 import { TrashIcon, Pencil1Icon, ExternalLinkIcon, CalendarIcon } from '@radix-ui/react-icons'
 import { tagColor } from '@/lib/tag-colors'
 import type { Recipe } from '@/types/recipe'
+import { t } from '@/lib/i18n'
 
 interface RecipeCardProps {
   recipe: Recipe
@@ -64,7 +65,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
               size="1"
               variant="ghost"
               asChild
-              aria-label="Open recipe"
+              aria-label={t.openRecipe}
             >
               <a href={recipe.url} target="_blank" rel="noopener noreferrer">
                 <ExternalLinkIcon />
@@ -107,17 +108,9 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
       )}
       <Box p="3">
         <Flex direction="column" gap="2">
-          <Flex align="center" justify="between" gap="2">
-            <Heading size="3" truncate>
-              {recipe.title}
-            </Heading>
-            <Badge
-              color={recipe.ingredientsSource === 'auto' ? 'green' : 'blue'}
-              variant="soft"
-            >
-              {recipe.ingredientsSource}
-            </Badge>
-          </Flex>
+          <Heading size="3" truncate>
+            {recipe.title}
+          </Heading>
 
           {recipe.tags && recipe.tags.length > 0 && (
             <Flex gap="1" wrap="wrap">
@@ -130,14 +123,14 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
           )}
 
           <Text size="2" color="gray">
-            {recipe.ingredients.length} ingredient{recipe.ingredients.length !== 1 ? 's' : ''}
+            {t.ingredientsCount(recipe.ingredients.length)}
           </Text>
 
           <Flex gap="2" mt="2" align="center">
             <Button variant="soft" size="2" asChild>
               <a href={recipe.url} target="_blank" rel="noopener noreferrer">
                 <ExternalLinkIcon />
-                Open Recipe
+                {t.openRecipe}
               </a>
             </Button>
 
@@ -148,7 +141,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
                   variant="soft"
                   color="green"
                   onClick={() => onSwapToMenu(recipe)}
-                  aria-label="Add to menu"
+                  aria-label={t.addToMenu}
                 >
                   <CalendarIcon />
                 </IconButton>
@@ -158,7 +151,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
                   size="2"
                   variant="ghost"
                   onClick={() => onEdit(recipe)}
-                  aria-label="Edit recipe"
+                  aria-label={t.editRecipe}
                 >
                   <Pencil1Icon />
                 </IconButton>
@@ -169,7 +162,7 @@ export function RecipeCard({ recipe, onDelete, onEdit, onSwapToMenu, compact = f
                   variant="ghost"
                   color="red"
                   onClick={() => onDelete(recipe.id)}
-                  aria-label="Delete recipe"
+                  aria-label={t.deleteRecipe}
                 >
                   <TrashIcon />
                 </IconButton>

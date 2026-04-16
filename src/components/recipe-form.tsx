@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { Cross2Icon, MagicWandIcon, UpdateIcon } from '@radix-ui/react-icons'
 import { TagInput } from '@/components/tag-input'
 import type { RecipeFormData } from '@/types/recipe'
+import { t } from '@/lib/i18n'
 
 interface FetchResult {
   title: string
@@ -39,29 +40,29 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
   function validate(): boolean {
     const newErrors: { url?: string; title?: string } = {}
     if (!url.trim()) {
-      newErrors.url = 'URL is required'
+      newErrors.url = t.urlRequired
     } else {
       try {
         new URL(url.trim())
       } catch {
-        newErrors.url = 'Please enter a valid URL'
+        newErrors.url = t.validUrl
       }
     }
-    if (!title.trim()) newErrors.title = 'Title is required'
+    if (!title.trim()) newErrors.title = t.titleRequired
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
   const fetchMetadata = useCallback(async () => {
     if (!url.trim()) {
-      setErrors({ url: 'Enter a URL first' })
+      setErrors({ url: t.enterUrlFirst })
       return
     }
 
     try {
       new URL(url.trim())
     } catch {
-      setErrors({ url: 'Enter a valid URL' })
+      setErrors({ url: t.enterValidUrl })
       return
     }
 
@@ -69,19 +70,16 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
     setErrors({})
 
     try {
-      const apiUrl = import.meta.env.DEV
-        ? '/api/fetch-recipe'
-        : '/api/fetch-recipe'
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/api/fetch-recipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ url: url.trim() }),
       })
 
       if (!response.ok) {
         const data = await response.json()
-        toast.error(data.error || 'Failed to fetch recipe data. Fill in details manually.')
+        toast.error(data.error || t.fetchFailed)
         return
       }
 
@@ -93,13 +91,13 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
       if (data.ingredients && data.ingredients.length > 0) {
         setIngredientsText(data.ingredients.join('\n'))
         setIngredientsSource('auto')
-        toast.success(`Fetched ${data.ingredients.length} ingredients via ${data.source}`)
+        toast.success(t.fetchSuccess(data.ingredients.length, data.source))
       } else {
         setIngredientsSource('manual')
-        toast.success(`Fetched title and image via ${data.source}. No ingredients found — enter them manually.`)
+        toast.success(t.fetchPartial(data.source))
       }
     } catch {
-      toast.error('Could not reach the server. Fill in details manually.')
+      toast.error(t.fetchOffline)
     } finally {
       setIsFetching(false)
     }
@@ -129,13 +127,13 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
       <Flex direction="column" gap="4">
         <Box>
           <Text as="label" size="2" weight="medium" mb="1" htmlFor="recipe-url">
-            Recipe URL *
+            {t.labelUrl}
           </Text>
           <Flex gap="2" align="start">
             <Box flexGrow="1">
               <TextField.Root
                 id="recipe-url"
-                placeholder="https://example.com/recipe"
+                placeholder={t.placeholderUrl}
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
               />
@@ -153,7 +151,7 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
                 disabled={isFetching}
               >
                 {isFetching ? <UpdateIcon /> : <MagicWandIcon />}
-                {isFetching ? 'Fetching...' : 'Auto-fill'}
+                {isFetching ? t.fetching : t.autoFill}
               </Button>
             )}
           </Flex>
@@ -161,11 +159,11 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
 
         <Box>
           <Text as="label" size="2" weight="medium" mb="1" htmlFor="recipe-title">
-            Title *
+            {t.labelTitle}
           </Text>
           <TextField.Root
             id="recipe-title"
-            placeholder="Recipe title"
+            placeholder={t.placeholderTitle}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
@@ -178,11 +176,11 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
 
         <Box>
           <Text as="label" size="2" weight="medium" mb="1" htmlFor="recipe-image-url">
-            Image URL
+            {t.labelImageUrl}
           </Text>
           <TextField.Root
             id="recipe-image-url"
-            placeholder="https://example.com/image.jpg"
+            placeholder={t.placeholderImageUrl}
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
           />
@@ -205,11 +203,11 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
 
         <Box>
           <Text as="label" size="2" weight="medium" mb="1" htmlFor="recipe-ingredients">
-            Ingredients (one per line)
+            {t.labelIngredients}
           </Text>
           <TextArea
             id="recipe-ingredients"
-            placeholder={"2 cups flour\n1 tsp salt\n3 eggs"}
+            placeholder={t.placeholderIngredients}
             rows={6}
             value={ingredientsText}
             onChange={(e) => {
@@ -221,7 +219,7 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
 
         <Box>
           <Text as="label" size="2" weight="medium" mb="1">
-            Tags
+            {t.labelTags}
           </Text>
           <TagInput tags={tags} onChange={setTags} />
         </Box>
@@ -235,15 +233,15 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
               onClick={onCancel}
             >
               <Cross2Icon />
-              Cancel
+              {t.cancel}
             </Button>
           )}
           <Button type="submit" disabled={isLoading}>
             {isLoading
-              ? 'Saving...'
+              ? t.saving
               : isEditing
-                ? 'Save Changes'
-                : 'Add Recipe'}
+                ? t.saveChanges
+                : t.addRecipe}
           </Button>
         </Flex>
       </Flex>

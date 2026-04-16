@@ -20,6 +20,7 @@ import { RecipeForm } from "@/components/recipe-form";
 import { SlotPickerDialog } from "@/components/slot-picker-dialog";
 import { SkeletonCard } from "@/components/skeleton-card";
 import type { Recipe, RecipeFormData } from "@/types/recipe";
+import { t } from "@/lib/i18n";
 
 export function RecipesListPage() {
   const { recipes, recipeCount, isLoading, deleteRecipe, updateRecipe } =
@@ -43,21 +44,21 @@ export function RecipesListPage() {
   const handleDeleteConfirm = async () => {
     if (!deletingRecipe) return;
     await deleteRecipe(deletingRecipe.id);
-    toast.success("Recipe deleted");
+    toast.success(t.recipeDeleted);
     setDeletingRecipe(null);
   };
 
   const handleEditSubmit = async (data: RecipeFormData) => {
     if (!editingRecipe) return;
     await updateRecipe(editingRecipe.id, data);
-    toast.success("Recipe updated");
+    toast.success(t.recipeUpdated);
     setEditingRecipe(null);
   };
 
   if (isLoading) {
     return (
       <Box p="4">
-        <Heading size="6" mb="4">My Recipes</Heading>
+        <Heading size="6" mb="4">{t.myRecipes}</Heading>
         <Grid gap="4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}>
           {Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
         </Grid>
@@ -69,7 +70,7 @@ export function RecipesListPage() {
     <Box p="4">
       <Flex justify="between" align="center" mb="4">
         <Flex align="center" gap="2">
-          <Heading size="6">My Recipes</Heading>
+          <Heading size="6">{t.myRecipes}</Heading>
           <Text size="2" color="gray">
             (
             {searchQuery.trim()
@@ -80,7 +81,7 @@ export function RecipesListPage() {
         </Flex>
         <Button asChild>
           <Link to="/add">
-            <PlusIcon /> Add Recipe
+            <PlusIcon /> {t.addRecipe}
           </Link>
         </Button>
       </Flex>
@@ -88,7 +89,7 @@ export function RecipesListPage() {
       {recipes.length > 0 && (
         <Box mb="4">
           <TextField.Root
-            placeholder="Search recipes..."
+            placeholder={t.searchPlaceholder}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             size="2"
@@ -103,18 +104,18 @@ export function RecipesListPage() {
       {recipes.length === 0 ? (
         <Flex direction="column" align="center" gap="4" py="8">
           <Text size="3" color="gray">
-            No recipes yet. Add your first recipe!
+            {t.noRecipesYet}
           </Text>
           <Button asChild>
             <Link to="/add">
-              <PlusIcon /> Add Recipe
+              <PlusIcon /> {t.addRecipe}
             </Link>
           </Button>
         </Flex>
       ) : filteredRecipes.length === 0 ? (
         <Flex direction="column" align="center" gap="2" py="8">
           <Text size="3" color="gray">
-            No recipes match "{searchQuery}"
+            {t.noSearchResults(searchQuery)}
           </Text>
         </Flex>
       ) : (
@@ -143,7 +144,7 @@ export function RecipesListPage() {
         }}
       >
         <Dialog.Content maxWidth="500px">
-          <Dialog.Title>Edit Recipe</Dialog.Title>
+          <Dialog.Title>{t.editRecipeTitle}</Dialog.Title>
           {editingRecipe && (
             <RecipeForm
               initialData={editingRecipe}
@@ -161,20 +162,19 @@ export function RecipesListPage() {
         }}
       >
         <AlertDialog.Content maxWidth="450px">
-          <AlertDialog.Title>Delete Recipe</AlertDialog.Title>
+          <AlertDialog.Title>{t.deleteRecipeTitle}</AlertDialog.Title>
           <AlertDialog.Description size="2">
-            Are you sure you want to delete this recipe? This action cannot be
-            undone.
+            {t.deleteConfirm}
           </AlertDialog.Description>
           <Flex gap="3" mt="4" justify="end">
             <AlertDialog.Cancel>
               <Button variant="soft" color="gray">
-                Cancel
+                {t.cancel}
               </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action>
               <Button variant="solid" color="red" onClick={handleDeleteConfirm}>
-                Delete
+                {t.deleteButton}
               </Button>
             </AlertDialog.Action>
           </Flex>
@@ -187,7 +187,7 @@ export function RecipesListPage() {
         onSelectSlot={async (slotIndex) => {
           if (!swappingRecipe) return;
           await setMenuSlot(slotIndex, swappingRecipe.id);
-          toast.success(`Added "${swappingRecipe.title}" to menu slot ${slotIndex + 1}`);
+          toast.success(t.addedToMenu(swappingRecipe.title, slotIndex + 1));
           setSwappingRecipe(null);
         }}
         menuRecipes={menu ?? []}

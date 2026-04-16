@@ -2,11 +2,9 @@ import { useState } from 'react'
 import { Badge, Box, Flex, TextField, Text } from '@radix-ui/themes'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import { tagColor } from '@/lib/tag-colors'
+import { t } from '@/lib/i18n'
 
-const SUGGESTIONS = [
-  'italian', 'asian', 'mexican', 'quick', 'vegetarian',
-  'vegan', 'soup', 'salad', 'dessert', 'comfort food',
-]
+const SUGGESTIONS = [...t.defaultTags]
 
 interface TagInputProps {
   tags: string[]
@@ -37,7 +35,7 @@ export function TagInput({ tags, onChange }: TagInputProps) {
     }
   }
 
-  const unusedSuggestions = SUGGESTIONS.filter((s) => !tags.includes(s))
+  const unusedSuggestions = SUGGESTIONS.filter((s) => !tags.includes(s.toLowerCase()))
 
   return (
     <Box>
@@ -59,7 +57,7 @@ export function TagInput({ tags, onChange }: TagInputProps) {
       )}
 
       <TextField.Root
-        placeholder="Add a tag..."
+        placeholder={t.addTagPlaceholder}
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -68,7 +66,7 @@ export function TagInput({ tags, onChange }: TagInputProps) {
 
       {unusedSuggestions.length > 0 && (
         <Flex gap="1" wrap="wrap" mt="2">
-          <Text size="1" color="gray" mr="1">Suggestions:</Text>
+          <Text size="1" color="gray" mr="1">{t.suggestions}</Text>
           {unusedSuggestions.map((s) => (
             <Badge
               key={s}

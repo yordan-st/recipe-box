@@ -9,6 +9,7 @@ import {
 } from '@/lib/algorithms/department-classifier'
 import { getGroceryChecklist, updateGroceryChecklist } from '@/lib/db/operations'
 import { scheduleSyncAfterMutation } from '@/lib/sync/sync-scheduler'
+import { t } from '@/lib/i18n'
 
 interface GroceryListProps {
   recipes: Recipe[]
@@ -94,9 +95,9 @@ export function GroceryList({ recipes, weekStart }: GroceryListProps) {
   if (items.length === 0) {
     return (
       <Box>
-        <Heading size="4" mb="2">Grocery List</Heading>
+        <Heading size="4" mb="2">{t.groceryList}</Heading>
         <Text size="2" color="gray">
-          No ingredients found. Add ingredients to your recipes to see them here.
+          {t.noIngredients}
         </Text>
       </Box>
     )
@@ -124,9 +125,9 @@ export function GroceryList({ recipes, weekStart }: GroceryListProps) {
   return (
     <Box>
       <Flex justify="between" align="center" mb="3">
-        <Heading size="4">Grocery List</Heading>
+        <Heading size="4">{t.groceryList}</Heading>
         <Text size="2" color="gray">
-          {remaining} of {items.length} remaining
+          {t.remaining(remaining, items.length)}
         </Text>
       </Flex>
 
@@ -178,7 +179,7 @@ export function GroceryList({ recipes, weekStart }: GroceryListProps) {
                         </Text>
                         {item.recipeTitles.length > 1 && (
                           <Box>
-                            <Text size="1" color="gray">Used in:</Text>
+                            <Text size="1" color="gray">{t.usedIn}</Text>
                             <ul style={{ margin: '2px 0 0 16px', padding: 0 }}>
                               {item.recipeTitles.map((title) => (
                                 <li key={title}>

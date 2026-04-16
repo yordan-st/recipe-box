@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button, Flex, Text } from "@radix-ui/themes";
 import { DownloadIcon, Cross2Icon } from "@radix-ui/react-icons";
+import { t } from "@/lib/i18n";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -86,7 +87,7 @@ export function InstallPrompt() {
           variant="ghost"
           color="gray"
           onClick={handleDismiss}
-          aria-label="Dismiss install prompt"
+          aria-label={t.dismissInstall}
           style={{
             position: "absolute",
             top: 8,
@@ -99,13 +100,13 @@ export function InstallPrompt() {
         <Flex align="center" justify="center" gap="2" mb="2">
           <DownloadIcon />
           <Text size="2" weight="medium">
-            Install Recipe Box for a faster, app-like experience.
+            {t.installMessage}
           </Text>
         </Flex>
 
         <Flex justify="center">
           <Button size="2" variant="solid" onClick={handleInstall}>
-            Install
+            {t.install}
           </Button>
         </Flex>
       </div>

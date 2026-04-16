@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Box, Flex, Text, Heading, TextField, Button } from '@radix-ui/themes'
+import { t } from '@/lib/i18n'
 
 interface LoginScreenProps {
   onLogin: (password: string) => Promise<boolean>
@@ -32,14 +33,14 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       <Box style={{ width: '100%', maxWidth: 360 }}>
         <form onSubmit={handleSubmit}>
           <Flex direction="column" gap="4" align="center">
-            <Heading size="6">Recipe Box</Heading>
+            <Heading size="6">{t.loginTitle}</Heading>
             <Text size="2" color="gray">
-              Enter password to continue
+              {t.loginSubtitle}
             </Text>
             <TextField.Root
               size="3"
               type="password"
-              placeholder="Password"
+              placeholder={t.loginPlaceholder}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoFocus
@@ -47,7 +48,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             />
             {error && (
               <Text size="2" color="red">
-                Wrong password
+                {t.loginError}
               </Text>
             )}
             <Button
@@ -56,7 +57,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               disabled={loading || !password}
               style={{ width: '100%' }}
             >
-              {loading ? 'Checking...' : 'Log in'}
+              {loading ? t.loginChecking : t.loginButton}
             </Button>
           </Flex>
         </form>
