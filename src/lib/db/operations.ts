@@ -144,6 +144,14 @@ export async function markRecipesSynced(ids: string[]): Promise<void> {
 export async function upsertRecipeFromServer(recipe: Recipe): Promise<void> {
   const local = await db.recipes.get(recipe.id);
   if (!local || local.updatedAt < recipe.updatedAt) {
+    // If no local record by ID, check for URL conflict from a different ID
+    if (!local) {
+      const byUrl = await db.recipes.where('url').equals(recipe.url).first();
+      if (byUrl && byUrl.id !== recipe.id) {
+        // Remove stale local record to avoid unique index conflict
+        await db.recipes.delete(byUrl.id);
+      }
+    }
     await db.recipes.put({ ...recipe, syncStatus: 'synced' });
   }
 }

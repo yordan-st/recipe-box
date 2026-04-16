@@ -130,8 +130,9 @@ export async function fullSync(): Promise<void> {
   setState('syncing');
 
   try {
-    await pushChanges();
+    // Pull first so we get server state before push advances the timestamp
     await pullChanges();
+    await pushChanges();
 
     // Update pending count
     const pending = await getPendingRecipes();
