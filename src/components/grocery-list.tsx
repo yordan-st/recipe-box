@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
 import { Box, Flex, Text, Heading, Checkbox } from '@radix-ui/themes'
 import type { Recipe } from '@/types/recipe'
 import {
@@ -6,6 +7,8 @@ import {
   DEPARTMENT_ORDER,
   type Department,
 } from '@/lib/algorithms/department-classifier'
+import { getGroceryChecklist, updateGroceryChecklist } from '@/lib/db/operations'
+import { scheduleSyncAfterMutation } from '@/lib/sync/sync-scheduler'
 
 interface GroceryListProps {
   recipes: Recipe[]
@@ -58,19 +61,35 @@ function groupByDepartment(items: GroceryItem[]): Map<Department, GroceryItem[]>
 
 export function GroceryList({ recipes, weekStart }: GroceryListProps) {
   const items = aggregateIngredients(recipes)
-  const storageKey = weekStart ? `grocery-checked-${weekStart}` : null
 
-  const [checked, setChecked] = useState<Set<string>>(() => {
-    if (!storageKey) return new Set()
-    const stored = localStorage.getItem(storageKey)
-    return stored ? new Set(JSON.parse(stored)) : new Set()
-  })
+  const checklist = useLiveQuery(
+    () => weekStart ? getGroceryChecklist(weekStart) : undefined,
+    [weekStart],
+  )
 
+  const [checked, setChecked] = useState<Set<string>>(new Set())
+
+  // Sync local state from Dexie when checklist loads/changes
   useEffect(() => {
-    if (storageKey) {
-      localStorage.setItem(storageKey, JSON.stringify([...checked]))
+    if (checklist) {
+      setChecked(new Set(checklist.checkedItems))
     }
-  }, [checked, storageKey])
+  }, [checklist])
+
+  // Migrate existing localStorage data on first load
+  useEffect(() => {
+    if (!weekStart || checklist !== undefined) return
+    const stored = localStorage.getItem(`grocery-checked-${weekStart}`)
+    if (stored) {
+      const items = JSON.parse(stored) as string[]
+      if (items.length > 0) {
+        updateGroceryChecklist(weekStart, items).then(() => {
+          localStorage.removeItem(`grocery-checked-${weekStart}`)
+          scheduleSyncAfterMutation()
+        })
+      }
+    }
+  }, [weekStart, checklist])
 
   if (items.length === 0) {
     return (
@@ -83,7 +102,7 @@ export function GroceryList({ recipes, weekStart }: GroceryListProps) {
     )
   }
 
-  const toggle = (key: string) => {
+  const toggle = useCallback((key: string) => {
     setChecked((prev) => {
       const next = new Set(prev)
       if (next.has(key)) {
@@ -91,9 +110,13 @@ export function GroceryList({ recipes, weekStart }: GroceryListProps) {
       } else {
         next.add(key)
       }
+      if (weekStart) {
+        updateGroceryChecklist(weekStart, [...next])
+        scheduleSyncAfterMutation()
+      }
       return next
     })
-  }
+  }, [weekStart])
 
   const remaining = items.length - checked.size
   const grouped = groupByDepartment(items)

@@ -1,5 +1,5 @@
 import { db } from './schema';
-import type { Recipe, WeeklyMenu, UserPreferences } from '@/types/recipe';
+import type { Recipe, WeeklyMenu, UserPreferences, GroceryChecklist } from '@/types/recipe';
 
 export async function addRecipe(recipe: Omit<Recipe, 'id' | 'dateAdded' | 'timesShown' | 'updatedAt' | 'syncStatus'>): Promise<string> {
   const existing = await db.recipes.where('url').equals(recipe.url).first();
@@ -207,5 +207,50 @@ export async function updateUserPreferences(updates: Partial<Omit<UserPreference
       updatedAt: Date.now(),
       syncStatus: 'pending' as const,
     });
+  }
+}
+
+// ── Grocery checklists ──
+
+export async function getGroceryChecklist(weekStart: number): Promise<GroceryChecklist | undefined> {
+  return db.groceryChecklists.where('weekStart').equals(weekStart).first();
+}
+
+export async function updateGroceryChecklist(weekStart: number, checkedItems: string[]): Promise<void> {
+  const existing = await db.groceryChecklists.where('weekStart').equals(weekStart).first();
+  const now = Date.now();
+  if (existing) {
+    await db.groceryChecklists.update(existing.id, {
+      checkedItems,
+      updatedAt: now,
+      syncStatus: 'pending' as const,
+    });
+  } else {
+    await db.groceryChecklists.add({
+      id: crypto.randomUUID(),
+      weekStart,
+      checkedItems,
+      updatedAt: now,
+      syncStatus: 'pending',
+    });
+  }
+}
+
+export async function getPendingGroceryChecklists(): Promise<GroceryChecklist[]> {
+  return db.groceryChecklists.where('syncStatus').equals('pending').toArray();
+}
+
+export async function markGroceryChecklistsSynced(ids: string[]): Promise<void> {
+  await db.transaction('rw', db.groceryChecklists, async () => {
+    for (const id of ids) {
+      await db.groceryChecklists.update(id, { syncStatus: 'synced' as const });
+    }
+  });
+}
+
+export async function upsertGroceryChecklistFromServer(checklist: GroceryChecklist): Promise<void> {
+  const local = await db.groceryChecklists.get(checklist.id);
+  if (!local || local.updatedAt < checklist.updatedAt) {
+    await db.groceryChecklists.put({ ...checklist, syncStatus: 'synced' });
   }
 }

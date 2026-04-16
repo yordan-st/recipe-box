@@ -31,6 +31,14 @@ export interface UserPreferences {
   syncStatus: 'pending' | 'synced';
 }
 
+export interface GroceryChecklist {
+  id: string;
+  weekStart: number;
+  checkedItems: string[];
+  updatedAt: number;
+  syncStatus: 'pending' | 'synced';
+}
+
 export interface SyncMeta {
   id: string;
   lastSyncedAt: number;
