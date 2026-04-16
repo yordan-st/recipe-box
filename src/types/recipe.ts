@@ -27,6 +27,7 @@ export interface WeeklyMenu {
 export interface UserPreferences {
   id: string;
   menuSize: number;
+  customTags?: string[];
   updatedAt: number;
   syncStatus: 'pending' | 'synced';
 }
