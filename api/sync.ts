@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { sql } from '@vercel/postgres';
-import { verifyAuth } from './auth';
+import { verifyAuth } from './_lib/verify-auth';
 
 interface SyncRecipe {
   id: string;
