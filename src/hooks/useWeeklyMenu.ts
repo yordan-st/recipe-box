@@ -13,6 +13,7 @@ import {
 } from '@/lib/algorithms/weekly-selection';
 import { useCallback } from 'react';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { scheduleSyncAfterMutation } from '@/lib/sync/sync-scheduler';
 
 export function useWeeklyMenu() {
   const weekStart = getWeekStartTimestamp();
@@ -49,6 +50,7 @@ export function useWeeklyMenu() {
     });
 
     await markRecipesShown(recipeIds);
+    scheduleSyncAfterMutation();
   }, [weekStart, preferences.menuSize]);
 
   const setMenuSlot = useCallback(async (slotIndex: number, recipeId: string) => {
@@ -65,6 +67,7 @@ export function useWeeklyMenu() {
         generatedAt: Date.now(),
       });
       await markRecipesShown([recipeId]);
+      scheduleSyncAfterMutation();
       return;
     }
 
@@ -85,6 +88,7 @@ export function useWeeklyMenu() {
     });
 
     await markRecipesShown([recipeId]);
+    scheduleSyncAfterMutation();
   }, [currentWeekMenu, weekStart, preferences.menuSize]);
 
   const fillRemainingSlots = useCallback(async () => {
@@ -131,6 +135,7 @@ export function useWeeklyMenu() {
     });
 
     await markRecipesShown(autoSelected.map((r) => r.id));
+    scheduleSyncAfterMutation();
   }, [currentWeekMenu, weekStart, preferences.menuSize]);
 
   const isLoading = currentWeekMenu === undefined || menu === undefined;

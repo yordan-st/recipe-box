@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { getUserPreferences, updateUserPreferences } from '@/lib/db/operations';
+import { scheduleSyncAfterMutation } from '@/lib/sync/sync-scheduler';
 import type { UserPreferences } from '@/types/recipe';
 
 export function useUserPreferences() {
@@ -14,6 +15,7 @@ export function useUserPreferences() {
   const update = useCallback(
     async (updates: Partial<Omit<UserPreferences, 'id'>>) => {
       await updateUserPreferences(updates);
+      scheduleSyncAfterMutation();
     },
     [],
   );

@@ -127,6 +127,56 @@ export async function getUserPreferences(): Promise<UserPreferences> {
   return DEFAULT_PREFERENCES;
 }
 
+// ── Sync operations ──
+
+export async function getPendingRecipes(): Promise<Recipe[]> {
+  return db.recipes.where('syncStatus').equals('pending').toArray();
+}
+
+export async function markRecipesSynced(ids: string[]): Promise<void> {
+  await db.transaction('rw', db.recipes, async () => {
+    for (const id of ids) {
+      await db.recipes.update(id, { syncStatus: 'synced' as const });
+    }
+  });
+}
+
+export async function upsertRecipeFromServer(recipe: Recipe): Promise<void> {
+  const local = await db.recipes.get(recipe.id);
+  if (!local || local.updatedAt < recipe.updatedAt) {
+    await db.recipes.put({ ...recipe, syncStatus: 'synced' });
+  }
+}
+
+export async function upsertPreferencesFromServer(prefs: UserPreferences): Promise<void> {
+  const local = await db.userPreferences.get(prefs.id);
+  if (!local || local.updatedAt < prefs.updatedAt) {
+    await db.userPreferences.put({ ...prefs, syncStatus: 'synced' });
+  }
+}
+
+export async function upsertWeeklyMenuFromServer(menu: WeeklyMenu): Promise<void> {
+  const local = await db.weeklyMenus.get(menu.id);
+  if (!local) {
+    await db.weeklyMenus.put(menu);
+  }
+}
+
+export async function getSyncMeta(): Promise<{ lastSyncedAt: number }> {
+  const meta = await db.syncMeta.get('default');
+  return { lastSyncedAt: meta?.lastSyncedAt ?? 0 };
+}
+
+export async function updateSyncMeta(lastSyncedAt: number): Promise<void> {
+  await db.syncMeta.put({ id: 'default', lastSyncedAt });
+}
+
+export async function getCurrentWeeklyMenus(): Promise<WeeklyMenu[]> {
+  return db.weeklyMenus.orderBy('weekStart').reverse().limit(4).toArray();
+}
+
+// ── User preferences ──
+
 export async function updateUserPreferences(updates: Partial<Omit<UserPreferences, 'id'>>): Promise<void> {
   const existing = await db.userPreferences.get('default');
   if (existing) {

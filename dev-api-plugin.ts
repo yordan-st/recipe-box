@@ -46,6 +46,42 @@ export function devApiPlugin(): Plugin {
   return {
     name: 'dev-api',
     configureServer(server) {
+      // Sync endpoints — stub for local dev (no Postgres needed)
+      server.middlewares.use('/api/sync', (req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+        if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
+
+        if (req.method === 'GET') {
+          res.writeHead(200);
+          res.end(JSON.stringify({ recipes: [], preferences: null, weeklyMenus: [], serverTime: Date.now() }));
+          return;
+        }
+
+        if (req.method === 'POST') {
+          // Consume body
+          let body = '';
+          req.on('data', (chunk: Buffer) => { body += chunk; });
+          req.on('end', () => {
+            res.writeHead(200);
+            res.end(JSON.stringify({ success: true, recipesUpserted: 0, menusUpserted: 0, serverTime: Date.now() }));
+          });
+          return;
+        }
+
+        res.writeHead(405);
+        res.end(JSON.stringify({ error: 'Method not allowed' }));
+      });
+
+      server.middlewares.use('/api/setup-db', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.writeHead(200);
+        res.end(JSON.stringify({ success: true, message: 'Dev mode — no DB setup needed' }));
+      });
+
       server.middlewares.use('/api/fetch-recipe', async (req, res) => {
         if (req.method === 'OPTIONS') {
           res.writeHead(200, {
