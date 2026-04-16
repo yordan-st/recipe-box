@@ -27,9 +27,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Navigation */
-nav {
+/* Top navigation */
+.top-nav {
   background: var(--color-surface);
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--gray-5);
   position: sticky;
   top: 0;
@@ -60,7 +63,6 @@ nav {
   display: none;
 }
 
-
 /* Bottom nav (mobile only) */
 .bottom-nav {
   display: none;
@@ -79,7 +81,9 @@ nav {
     bottom: 0;
     left: 0;
     right: 0;
-    background: var(--color-surface);
+    background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-top: 1px solid var(--gray-5);
     z-index: 10;
     padding: 6px 0 env(safe-area-inset-bottom, 8px);
