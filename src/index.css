@@ -86,7 +86,7 @@ body {
     -webkit-backdrop-filter: blur(12px);
     border-top: 1px solid var(--gray-5);
     z-index: 10;
-    padding: 4px 0 env(safe-area-inset-bottom, 12px);
+    padding: 4px 0 calc(env(safe-area-inset-bottom, 0px) + 14px);
     justify-content: space-around;
   }
   .bottom-nav-item {
@@ -106,7 +106,11 @@ body {
     color: var(--accent-11);
   }
   .main-content {
-    padding-bottom: 80px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  /* Prevent iOS auto-zoom on input focus (requires >= 16px) */
+  input, select, textarea {
+    font-size: 16px !important;
   }
 }
 

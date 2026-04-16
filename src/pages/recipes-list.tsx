@@ -143,7 +143,7 @@ export function RecipesListPage() {
           if (!open) setEditingRecipe(null);
         }}
       >
-        <Dialog.Content maxWidth="500px">
+        <Dialog.Content maxWidth="500px" onOpenAutoFocus={(e) => e.preventDefault()}>
           <Dialog.Title>{t.editRecipeTitle}</Dialog.Title>
           {editingRecipe && (
             <RecipeForm
@@ -161,7 +161,7 @@ export function RecipesListPage() {
           if (!open) setDeletingRecipe(null);
         }}
       >
-        <AlertDialog.Content maxWidth="450px">
+        <AlertDialog.Content maxWidth="450px" onOpenAutoFocus={(e) => e.preventDefault()}>
           <AlertDialog.Title>{t.deleteRecipeTitle}</AlertDialog.Title>
           <AlertDialog.Description size="2">
             {t.deleteConfirm}
