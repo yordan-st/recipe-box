@@ -87,3 +87,9 @@ nav {
 .rt-Card img {
   border-radius: var(--radius-2) var(--radius-2) 0 0;
 }
+
+/* Sync spinner */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

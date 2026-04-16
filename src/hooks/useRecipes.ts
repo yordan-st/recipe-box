@@ -1,10 +1,12 @@
+import { useCallback } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db/schema';
 import {
-  addRecipe,
-  updateRecipe,
-  deleteRecipe,
+  addRecipe as addRecipeOp,
+  updateRecipe as updateRecipeOp,
+  deleteRecipe as deleteRecipeOp,
 } from '@/lib/db/operations';
+import { scheduleSyncAfterMutation } from '@/lib/sync/sync-scheduler';
 import type { Recipe } from '@/types/recipe';
 
 export function useRecipes() {
@@ -17,6 +19,22 @@ export function useRecipes() {
     const all = await db.recipes.toArray();
     return all.filter((r) => !r.deletedAt).length;
   });
+
+  const addRecipe = useCallback(async (...args: Parameters<typeof addRecipeOp>) => {
+    const result = await addRecipeOp(...args);
+    scheduleSyncAfterMutation();
+    return result;
+  }, []);
+
+  const updateRecipe = useCallback(async (...args: Parameters<typeof updateRecipeOp>) => {
+    await updateRecipeOp(...args);
+    scheduleSyncAfterMutation();
+  }, []);
+
+  const deleteRecipe = useCallback(async (...args: Parameters<typeof deleteRecipeOp>) => {
+    await deleteRecipeOp(...args);
+    scheduleSyncAfterMutation();
+  }, []);
 
   return {
     recipes: recipes ?? [],

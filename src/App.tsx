@@ -11,6 +11,8 @@ import { SunIcon, MoonIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { InstallPrompt } from "@/components/install-prompt";
+import { SyncStatusIndicator } from "@/components/sync-status-indicator";
+import { startSyncScheduler } from "@/lib/sync/sync-scheduler";
 import { RecipesListPage } from "@/pages/recipes-list";
 import { AddRecipePage } from "@/pages/add-recipe";
 import { WeeklyViewPage } from "@/pages/weekly-view";
@@ -58,6 +60,7 @@ function AppLayout({
               <NavLink to="/">Recipes</NavLink>
               <NavLink to="/add">Add</NavLink>
               <NavLink to="/weekly">Menu</NavLink>
+              <SyncStatusIndicator />
               <IconButton
                 size="2"
                 variant="ghost"
@@ -70,6 +73,7 @@ function AppLayout({
 
             {/* Mobile nav */}
             <Flex ml="auto" align="center" gap="2" className="nav-mobile">
+              <SyncStatusIndicator />
               <IconButton
                 size="2"
                 variant="ghost"
@@ -118,6 +122,10 @@ function App() {
   const [appearance, setAppearance] = useState<"light" | "dark">(
     getInitialAppearance
   );
+
+  useEffect(() => {
+    startSyncScheduler();
+  }, []);
 
   const toggleAppearance = useCallback(() => {
     setAppearance((prev) => {
