@@ -91,6 +91,13 @@ export const t = {
   pickSlotDescription: 'Kies een plek om dit recept neer te zetten.',
   emptySlot: 'Lege plek',
 
+  // Finish week
+  finishWeek: 'Week Afsluiten',
+  finishWeekTitle: 'Week Afsluiten',
+  finishWeekDescription: 'Hiermee markeer je alle recepten als gekookt. Dit beïnvloedt welke recepten vaker of minder vaak worden voorgesteld.',
+  finishWeekConfirm: 'Afsluiten',
+  weekFinished: 'Week afgesloten! Recepten gemarkeerd als gekookt.',
+
   // Grocery list
   groceryList: 'Boodschappenlijst',
   noIngredients: 'Geen ingrediënten gevonden. Voeg ingrediënten toe aan je recepten om ze hier te zien.',

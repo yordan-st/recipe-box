@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heading, Text, Button, Flex, Box, Grid, Separator, Select } from '@radix-ui/themes';
-import { ReloadIcon, PlusIcon } from '@radix-ui/react-icons';
+import { Heading, Text, Button, Flex, Box, Grid, Separator, Select, AlertDialog } from '@radix-ui/themes';
+import { ReloadIcon, PlusIcon, CheckCircledIcon } from '@radix-ui/react-icons';
+import { toast } from 'sonner';
 import { MenuSlot } from '@/components/menu-slot';
 import { SkeletonCard } from '@/components/skeleton-card';
 import { RecipePickerDialog } from '@/components/recipe-picker-dialog';
@@ -41,6 +42,7 @@ export function WeeklyViewPage() {
     setMenuSlot,
     clearMenuSlot,
     fillRemainingSlots,
+    finishWeek,
     menuSize,
   } = useWeeklyMenu();
   const { recipeCount, isLoading: recipesLoading } = useRecipes();
@@ -151,6 +153,44 @@ export function WeeklyViewPage() {
           <Separator size="4" mb="4" />
 
           <GroceryList recipes={filledRecipes} weekStart={getWeekStartTimestamp()} />
+
+          {filledRecipes.length > 0 && (
+            <>
+              <Separator size="4" my="4" />
+              <Flex justify="center">
+                <AlertDialog.Root>
+                  <AlertDialog.Trigger>
+                    <Button variant="soft" color="green">
+                      <CheckCircledIcon /> {t.finishWeek}
+                    </Button>
+                  </AlertDialog.Trigger>
+                  <AlertDialog.Content maxWidth="450px">
+                    <AlertDialog.Title>{t.finishWeekTitle}</AlertDialog.Title>
+                    <AlertDialog.Description size="2">
+                      {t.finishWeekDescription}
+                    </AlertDialog.Description>
+                    <Flex gap="3" mt="4" justify="end">
+                      <AlertDialog.Cancel>
+                        <Button variant="soft" color="gray">{t.cancel}</Button>
+                      </AlertDialog.Cancel>
+                      <AlertDialog.Action>
+                        <Button
+                          variant="solid"
+                          color="green"
+                          onClick={async () => {
+                            await finishWeek();
+                            toast.success(t.weekFinished);
+                          }}
+                        >
+                          <CheckCircledIcon /> {t.finishWeekConfirm}
+                        </Button>
+                      </AlertDialog.Action>
+                    </Flex>
+                  </AlertDialog.Content>
+                </AlertDialog.Root>
+              </Flex>
+            </>
+          )}
         </>
       )}
 

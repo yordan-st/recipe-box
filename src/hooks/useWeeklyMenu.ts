@@ -157,6 +157,14 @@ export function useWeeklyMenu() {
     scheduleSyncAfterMutation();
   }, [currentWeekMenu, weekStart, preferences.menuSize]);
 
+  const finishWeek = useCallback(async () => {
+    if (!currentWeekMenu) return;
+    const filledIds = currentWeekMenu.recipeIds.filter((id) => id !== '');
+    if (filledIds.length === 0) return;
+    await markRecipesShown(filledIds);
+    scheduleSyncAfterMutation();
+  }, [currentWeekMenu]);
+
   const isLoading = currentWeekMenu === undefined || menu === undefined;
 
   // Pad menu to menuSize for slot rendering
@@ -171,6 +179,7 @@ export function useWeeklyMenu() {
     setMenuSlot,
     clearMenuSlot,
     fillRemainingSlots,
+    finishWeek,
     currentWeekMenu: currentWeekMenu ?? null,
     menuSize: preferences.menuSize,
   };
