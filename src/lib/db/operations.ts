@@ -126,9 +126,14 @@ const DEFAULT_PREFERENCES: UserPreferences = {
 
 export async function getUserPreferences(): Promise<UserPreferences> {
   const prefs = await db.userPreferences.get('default');
-  if (prefs) return prefs;
-  await db.userPreferences.add(DEFAULT_PREFERENCES);
-  return DEFAULT_PREFERENCES;
+  return prefs ?? DEFAULT_PREFERENCES;
+}
+
+export async function ensureDefaultPreferences(): Promise<void> {
+  const prefs = await db.userPreferences.get('default');
+  if (!prefs) {
+    await db.userPreferences.add(DEFAULT_PREFERENCES);
+  }
 }
 
 // ── Sync operations ──

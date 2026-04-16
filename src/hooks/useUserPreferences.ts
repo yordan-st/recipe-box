@@ -1,11 +1,16 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { getUserPreferences, updateUserPreferences } from '@/lib/db/operations';
+import { getUserPreferences, updateUserPreferences, ensureDefaultPreferences } from '@/lib/db/operations';
 import { scheduleSyncAfterMutation } from '@/lib/sync/sync-scheduler';
 import type { UserPreferences } from '@/types/recipe';
 
 export function useUserPreferences() {
   const preferences = useLiveQuery(() => getUserPreferences());
+
+  // Create default prefs row outside liveQuery (avoids ReadOnlyError)
+  useEffect(() => {
+    ensureDefaultPreferences();
+  }, []);
 
   const update = useCallback(
     async (updates: Partial<Omit<UserPreferences, 'id'>>) => {
