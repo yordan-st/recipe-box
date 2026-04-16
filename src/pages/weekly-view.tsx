@@ -93,7 +93,7 @@ export function WeeklyViewPage() {
   };
 
   return (
-    <Box p="4">
+    <Box py="4" px="5">
       <Flex justify="between" align="center" mb="4" wrap="wrap" gap="3">
         <Flex direction="column" gap="1">
           <Heading size="6">{t.thisWeeksMenu}</Heading>
