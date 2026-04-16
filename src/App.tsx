@@ -6,8 +6,8 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
-import { Theme, Flex, Container, IconButton, DropdownMenu } from "@radix-ui/themes";
-import { SunIcon, MoonIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { Theme, Flex, Container, IconButton, Text } from "@radix-ui/themes";
+import { SunIcon, MoonIcon, ReaderIcon, PlusIcon, CalendarIcon } from "@radix-ui/react-icons";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { InstallPrompt } from "@/components/install-prompt";
@@ -36,6 +36,29 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
     <Link to={to} className={`nav-link${isActive ? " nav-link-active" : ""}`}>
       {children}
     </Link>
+  );
+}
+
+function BottomNav() {
+  const location = useLocation();
+  const items = [
+    { to: '/', icon: <ReaderIcon width={20} height={20} />, label: t.navRecipes },
+    { to: '/add', icon: <PlusIcon width={20} height={20} />, label: t.navAdd },
+    { to: '/weekly', icon: <CalendarIcon width={20} height={20} />, label: t.navMenu },
+  ];
+
+  return (
+    <nav className="bottom-nav">
+      {items.map(({ to, icon, label }) => {
+        const isActive = location.pathname === to;
+        return (
+          <Link key={to} to={to} className={`bottom-nav-item${isActive ? ' bottom-nav-active' : ''}`}>
+            {icon}
+            <Text size="1">{label}</Text>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -74,7 +97,7 @@ function AppLayout({
               </IconButton>
             </Flex>
 
-            {/* Mobile nav */}
+            {/* Mobile top-right: sync + theme only */}
             <Flex ml="auto" align="center" gap="2" className="nav-mobile">
               <SyncStatusIndicator />
               <IconButton
@@ -85,30 +108,12 @@ function AppLayout({
               >
                 {appearance === "dark" ? <SunIcon /> : <MoonIcon />}
               </IconButton>
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger>
-                  <IconButton size="2" variant="ghost" aria-label={t.menuAriaLabel}>
-                    <HamburgerMenuIcon />
-                  </IconButton>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <DropdownMenu.Item asChild>
-                    <Link to="/" className="nav-dropdown-link">{t.navRecipes}</Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item asChild>
-                    <Link to="/add" className="nav-dropdown-link">{t.navAdd}</Link>
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item asChild>
-                    <Link to="/weekly" className="nav-dropdown-link">{t.navMenu}</Link>
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
             </Flex>
           </Flex>
         </Container>
       </nav>
 
-      <Container size="3" px="4" flexGrow="1" py="4">
+      <Container size="3" px="4" flexGrow="1" py="4" pb="6" className="main-content">
         <ErrorBoundary>
           <Routes>
             <Route path="/" element={<RecipesListPage />} />
@@ -117,6 +122,9 @@ function AppLayout({
           </Routes>
         </ErrorBoundary>
       </Container>
+
+      {/* Mobile bottom nav */}
+      <BottomNav />
     </Flex>
   );
 }
