@@ -61,6 +61,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Migration: add custom_tags column to user_preferences
     await sql`ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS custom_tags JSONB NOT NULL DEFAULT '[]'`;
 
+    // Migration: typed tags on recipes
+    await sql`ALTER TABLE recipes ADD COLUMN IF NOT EXISTS dish_type TEXT`;
+    await sql`ALTER TABLE recipes ADD COLUMN IF NOT EXISTS diet TEXT`;
+    await sql`ALTER TABLE recipes ADD COLUMN IF NOT EXISTS cuisine TEXT`;
+
+    // Migration: typed tag option lists on user_preferences
+    await sql`ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS dish_type_options JSONB NOT NULL DEFAULT '[]'`;
+    await sql`ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS diet_options JSONB NOT NULL DEFAULT '[]'`;
+    await sql`ALTER TABLE user_preferences ADD COLUMN IF NOT EXISTS cuisine_options JSONB NOT NULL DEFAULT '[]'`;
+
     await sql`CREATE INDEX IF NOT EXISTS idx_grocery_checklists_week_start ON grocery_checklists(week_start)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_grocery_checklists_updated_at ON grocery_checklists(updated_at)`;
     await sql`CREATE INDEX IF NOT EXISTS idx_recipes_updated_at ON recipes(updated_at)`;

@@ -2,7 +2,8 @@ import { useState, useCallback } from 'react'
 import { Flex, Button, Text, Box, TextField, TextArea } from '@radix-ui/themes'
 import { toast } from 'sonner'
 import { Cross2Icon, MagicWandIcon, UpdateIcon } from '@radix-ui/react-icons'
-import { TagInput } from '@/components/tag-input'
+import { TagCombobox } from '@/components/tag-combobox'
+import { useUserPreferences } from '@/hooks/useUserPreferences'
 import { getRecipeByUrl } from '@/lib/db/operations'
 import type { RecipeFormData } from '@/types/recipe'
 import { t } from '@/lib/i18n'
@@ -31,7 +32,11 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
   const [ingredientsSource, setIngredientsSource] = useState<'auto' | 'manual'>(
     initialData?.ingredientsSource ?? 'manual'
   )
-  const [tags, setTags] = useState<string[]>(initialData?.tags ?? [])
+  const [dishType, setDishType] = useState<string | null>(initialData?.dishType ?? null)
+  const [diet, setDiet] = useState<string | null>(initialData?.diet ?? null)
+  const [cuisine, setCuisine] = useState<string | null>(initialData?.cuisine ?? null)
+
+  const { preferences, addOption, removeOption } = useUserPreferences()
 
   const [errors, setErrors] = useState<{ url?: string; title?: string }>({})
   const [isFetching, setIsFetching] = useState(false)
@@ -137,7 +142,10 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
       imageUrl: imageUrl.trim() || undefined,
       ingredients,
       ingredientsSource: ingredients.length > 0 ? ingredientsSource : 'manual',
-      tags,
+      tags: [],
+      dishType: dishType || undefined,
+      diet: diet || undefined,
+      cuisine: cuisine || undefined,
     })
   }
 
@@ -247,9 +255,47 @@ export function RecipeForm({ initialData, onSubmit, onCancel, isLoading = false 
 
         <Box>
           <Text as="label" size="2" weight="medium" mb="1">
-            {t.labelTags}
+            {t.labelDishType}
           </Text>
-          <TagInput tags={tags} onChange={setTags} />
+          <TagCombobox
+            value={dishType}
+            onChange={setDishType}
+            options={preferences.dishTypeOptions ?? []}
+            onAddOption={(opt) => addOption('dishTypeOptions', opt)}
+            onRemoveOption={(opt) => removeOption('dishTypeOptions', opt)}
+            color="green"
+            placeholder={t.placeholderDishType}
+          />
+        </Box>
+
+        <Box>
+          <Text as="label" size="2" weight="medium" mb="1">
+            {t.labelDiet}
+          </Text>
+          <TagCombobox
+            value={diet}
+            onChange={setDiet}
+            options={preferences.dietOptions ?? []}
+            onAddOption={(opt) => addOption('dietOptions', opt)}
+            onRemoveOption={(opt) => removeOption('dietOptions', opt)}
+            color="amber"
+            placeholder={t.placeholderDiet}
+          />
+        </Box>
+
+        <Box>
+          <Text as="label" size="2" weight="medium" mb="1">
+            {t.labelCuisine}
+          </Text>
+          <TagCombobox
+            value={cuisine}
+            onChange={setCuisine}
+            options={preferences.cuisineOptions ?? []}
+            onAddOption={(opt) => addOption('cuisineOptions', opt)}
+            onRemoveOption={(opt) => removeOption('cuisineOptions', opt)}
+            color="blue"
+            placeholder={t.placeholderCuisine}
+          />
         </Box>
 
         <Flex gap="3" mt="2" justify="end">

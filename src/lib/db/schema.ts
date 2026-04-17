@@ -53,6 +53,27 @@ export class RecipeBoxDB extends Dexie {
       groceryChecklists: 'id, weekStart, syncStatus',
       syncMeta: 'id',
     });
+
+    this.version(6).stores({
+      recipes: 'id, url, dateAdded, lastShown, updatedAt, syncStatus',
+      weeklyMenus: 'id, weekStart, updatedAt, syncStatus',
+      userPreferences: 'id',
+      groceryChecklists: 'id, weekStart, syncStatus',
+      syncMeta: 'id',
+    }).upgrade(tx => {
+      tx.table('recipes').toCollection().modify(recipe => {
+        recipe.dishType = undefined;
+        recipe.diet = undefined;
+        recipe.cuisine = undefined;
+        recipe.tags = [];
+      });
+      tx.table('userPreferences').toCollection().modify(prefs => {
+        prefs.dishTypeOptions = [];
+        prefs.dietOptions = [];
+        prefs.cuisineOptions = [];
+        prefs.customTags = [];
+      });
+    });
   }
 }
 

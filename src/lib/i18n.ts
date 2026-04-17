@@ -112,20 +112,12 @@ export const t = {
   usedIn: "Gebruikt in:",
 
   // Tags
-  addTagPlaceholder: "Tag toevoegen...",
-  suggestions: "Suggesties:",
-  defaultTags: [
-    "Italiaans",
-    "Aziatisch",
-    "Mexicaans",
-    "Snel",
-    "Vegetarisch",
-    "Veganistisch",
-    "Soep",
-    "Salade",
-    "Dessert",
-    "Comfort food",
-  ] as const,
+  labelDishType: "Gerecht",
+  labelDiet: "Dieet",
+  labelCuisine: "Keuken",
+  placeholderDishType: "bijv. pasta, rijst, soep...",
+  placeholderDiet: "bijv. vlees, vis, vegetarisch...",
+  placeholderCuisine: "bijv. Italiaans, Aziatisch, Mexicaans...",
 
   // Sync
   syncing: "Synchroniseren...",

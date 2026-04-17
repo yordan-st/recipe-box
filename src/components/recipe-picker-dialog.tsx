@@ -34,7 +34,9 @@ export function RecipePickerDialog({
     const q = search.trim().toLowerCase()
     return (
       r.title.toLowerCase().includes(q) ||
-      r.tags?.some((tag) => tag.toLowerCase().includes(q))
+      r.dishType?.toLowerCase().includes(q) ||
+      r.diet?.toLowerCase().includes(q) ||
+      r.cuisine?.toLowerCase().includes(q)
     )
   })
 
@@ -113,7 +115,9 @@ export function RecipePickerDialog({
                     </Text>
                     <Text size="1" color="gray">
                       {t.ingredientsCount(recipe.ingredients.length)}
-                      {recipe.tags?.length ? ` · ${recipe.tags.join(', ')}` : ''}
+                      {[recipe.dishType, recipe.diet, recipe.cuisine].filter(Boolean).length
+                        ? ` · ${[recipe.dishType, recipe.diet, recipe.cuisine].filter(Boolean).join(', ')}`
+                        : ''}
                     </Text>
                   </Flex>
                 </Flex>

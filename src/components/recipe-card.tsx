@@ -14,7 +14,7 @@ import {
   CalendarIcon,
   DotsHorizontalIcon,
 } from "@radix-ui/react-icons";
-import { tagColor } from "@/lib/tag-colors";
+import { TAG_CATEGORY_COLORS } from "@/lib/tag-colors";
 import type { Recipe } from "@/types/recipe";
 import { t } from "@/lib/i18n";
 
@@ -92,17 +92,16 @@ export function RecipeCard({
               </a>
             </IconButton>
           </Flex>
-          {recipe.tags && recipe.tags.length > 0 && (
+          {(recipe.dishType || recipe.diet || recipe.cuisine) && (
             <Flex gap="1" wrap="wrap" mt="1">
-              {recipe.tags.slice(0, 2).map((tag) => (
-                <Badge key={tag} variant="soft" size="1" color={tagColor(tag)}>
-                  {tag}
-                </Badge>
-              ))}
-              {recipe.tags.length > 2 && (
-                <Badge variant="soft" size="1" color="gray">
-                  +{recipe.tags.length - 2}
-                </Badge>
+              {recipe.dishType && (
+                <Badge variant="soft" size="1" color={TAG_CATEGORY_COLORS.dishType}>{recipe.dishType}</Badge>
+              )}
+              {recipe.diet && (
+                <Badge variant="soft" size="1" color={TAG_CATEGORY_COLORS.diet}>{recipe.diet}</Badge>
+              )}
+              {recipe.cuisine && (
+                <Badge variant="soft" size="1" color={TAG_CATEGORY_COLORS.cuisine}>{recipe.cuisine}</Badge>
               )}
             </Flex>
           )}
@@ -134,13 +133,17 @@ export function RecipeCard({
             {recipe.title}
           </Heading>
 
-          {recipe.tags && recipe.tags.length > 0 && (
+          {(recipe.dishType || recipe.diet || recipe.cuisine) && (
             <Flex gap="1" wrap="wrap">
-              {recipe.tags.map((tag) => (
-                <Badge key={tag} variant="soft" size="1" color={tagColor(tag)}>
-                  {tag}
-                </Badge>
-              ))}
+              {recipe.dishType && (
+                <Badge variant="soft" size="1" color={TAG_CATEGORY_COLORS.dishType}>{recipe.dishType}</Badge>
+              )}
+              {recipe.diet && (
+                <Badge variant="soft" size="1" color={TAG_CATEGORY_COLORS.diet}>{recipe.diet}</Badge>
+              )}
+              {recipe.cuisine && (
+                <Badge variant="soft" size="1" color={TAG_CATEGORY_COLORS.cuisine}>{recipe.cuisine}</Badge>
+              )}
             </Flex>
           )}
 

@@ -64,13 +64,14 @@ export function selectWeeklyMenu(
     selected.push(chosen.recipe);
     remaining.splice(chosenIndex, 1);
 
-    // Apply tag diversity penalty to remaining recipes sharing tags
-    if (chosen.recipe.tags && chosen.recipe.tags.length > 0) {
-      const chosenTags = new Set(chosen.recipe.tags);
-      for (const item of remaining) {
-        if (item.recipe.tags?.some((t) => chosenTags.has(t))) {
-          item.weight *= tagDiversityPenalty;
-        }
+    // Apply typed tag diversity penalty — stacks per shared category
+    for (const item of remaining) {
+      const shared =
+        (chosen.recipe.dishType && item.recipe.dishType === chosen.recipe.dishType ? 1 : 0) +
+        (chosen.recipe.diet && item.recipe.diet === chosen.recipe.diet ? 1 : 0) +
+        (chosen.recipe.cuisine && item.recipe.cuisine === chosen.recipe.cuisine ? 1 : 0);
+      if (shared > 0) {
+        item.weight *= Math.pow(tagDiversityPenalty, shared);
       }
     }
   }
