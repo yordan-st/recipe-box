@@ -45,7 +45,9 @@
       "Bash(curl -sI \"https://recipe-box-rouge.vercel.app/api/sync?since=0\")",
       "Bash(curl -s \"https://recipe-8i03ohzw6-yordan-sts-projects.vercel.app/api/sync?since=0\")",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'recipes: {len\\(d[\\\\\"recipes\\\\\"]\\)}, menus: {len\\(d[\\\\\"weeklyMenus\\\\\"]\\)}, checklists: {len\\(d[\\\\\"groceryChecklists\\\\\"]\\)}, prefs: {\\\\\"customTags\\\\\" in \\(d.get\\(\\\\\"preferences\\\\\"\\) or {}\\)}'\\)\")",
-      "Bash(curl -s \"https://recipe-box-rouge.vercel.app/api/fetch-recipe\" -X POST -H \"Content-Type: application/json\" -d '{\"url\":\"https://example.com\"}')"
+      "Bash(curl -s \"https://recipe-box-rouge.vercel.app/api/fetch-recipe\" -X POST -H \"Content-Type: application/json\" -d '{\"url\":\"https://example.com\"}')",
+      "Read(//Users/Yordan.Stoyanov/.claude/**)",
+      "Read(//Users/Yordan.Stoyanov/**)"
     ]
   }
 }
