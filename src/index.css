@@ -20,7 +20,12 @@ body,
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
     sans-serif;
   background-color: var(--color-background);
   -webkit-font-smoothing: antialiased;
@@ -30,7 +35,7 @@ body {
 /* Top navigation */
 .top-nav {
   background: var(--color-surface);
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--gray-5);
@@ -41,10 +46,12 @@ body {
 
 .nav-link {
   text-decoration: none;
-  color: var(--gray-11);
+  color: var(--gray-12);
   padding: 8px 12px;
   border-bottom: 2px solid transparent;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
   font-size: 0.95rem;
 }
 
@@ -81,12 +88,12 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+    background: color-mix(in srgb, var(--color-surface) 90%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-top: 1px solid var(--gray-5);
     z-index: 10;
-    padding: 4px 0 calc(env(safe-area-inset-bottom, 0px) + 14px);
+    padding: 4px 0 calc(env(safe-area-inset-bottom, 0px) + 8px);
     justify-content: space-around;
   }
   .bottom-nav-item {
@@ -98,7 +105,7 @@ body {
     gap: 2px;
     padding: 8px 0 4px;
     text-decoration: none;
-    color: var(--gray-9);
+    color: var(--gray-12);
     transition: color 0.15s ease;
   }
   .bottom-nav-item:hover,
@@ -109,14 +116,18 @@ body {
     padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)) !important;
   }
   /* Prevent iOS auto-zoom on input focus (requires >= 16px) */
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     font-size: 16px !important;
   }
 }
 
 /* Card hover effects */
 .rt-Card {
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .rt-Card:hover {
@@ -130,6 +141,10 @@ body {
 
 /* Sync spinner */
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

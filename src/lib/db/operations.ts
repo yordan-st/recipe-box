@@ -245,6 +245,10 @@ export async function updateGroceryChecklist(weekStart: number, checkedItems: st
   }
 }
 
+export async function clearGroceryChecklist(weekStart: number): Promise<void> {
+  await db.groceryChecklists.where('weekStart').equals(weekStart).delete();
+}
+
 export async function getPendingGroceryChecklists(): Promise<GroceryChecklist[]> {
   return db.groceryChecklists.where('syncStatus').equals('pending').toArray();
 }

@@ -72,9 +72,7 @@ export function GroceryList({ recipes, weekStart }: GroceryListProps) {
 
   // Sync local state from Dexie when checklist loads/changes
   useEffect(() => {
-    if (checklist) {
-      setChecked(new Set(checklist.checkedItems))
-    }
+    setChecked(checklist ? new Set(checklist.checkedItems) : new Set())
   }, [checklist])
 
   // Migrate existing localStorage data on first load
