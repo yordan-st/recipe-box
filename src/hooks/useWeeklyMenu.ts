@@ -6,6 +6,7 @@ import {
   getCurrentWeeklyMenu,
   markRecipesShown,
   getAllRecipes,
+  clearGroceryChecklist,
 } from '@/lib/db/operations';
 import {
   selectWeeklyMenu,
@@ -49,6 +50,7 @@ export function useWeeklyMenu() {
       generatedAt: Date.now(),
     });
 
+    await clearGroceryChecklist(weekStart);
     await markRecipesShown(recipeIds);
     scheduleSyncAfterMutation();
   }, [weekStart, preferences.menuSize]);
