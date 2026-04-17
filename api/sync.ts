@@ -20,6 +20,9 @@ interface SyncRecipe {
   ingredients: string[];
   ingredientsSource: 'auto' | 'manual';
   tags: string[];
+  dishType?: string;
+  diet?: string;
+  cuisine?: string;
   dateAdded: number;
   updatedAt: number;
   lastShown?: number;
@@ -31,6 +34,9 @@ interface SyncPreferences {
   id: string;
   menuSize: number;
   customTags?: string[];
+  dishTypeOptions?: string[];
+  dietOptions?: string[];
+  cuisineOptions?: string[];
   updatedAt: number;
 }
 
@@ -84,7 +90,8 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
 
   const { rows: recipeRows } = await sql`
     SELECT id, url, title, image_url, ingredients, ingredients_source,
-           tags, date_added, updated_at, last_shown, times_shown, deleted_at
+           tags, dish_type, diet, cuisine,
+           date_added, updated_at, last_shown, times_shown, deleted_at
     FROM recipes WHERE updated_at > ${since}
   `;
 
@@ -96,6 +103,9 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
     ingredients: r.ingredients,
     ingredientsSource: r.ingredients_source,
     tags: r.tags,
+    dishType: r.dish_type || undefined,
+    diet: r.diet || undefined,
+    cuisine: r.cuisine || undefined,
     dateAdded: Number(r.date_added),
     updatedAt: Number(r.updated_at),
     lastShown: r.last_shown ? Number(r.last_shown) : undefined,
@@ -104,7 +114,7 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
   }));
 
   const { rows: prefRows } = await sql`
-    SELECT id, menu_size, custom_tags, updated_at
+    SELECT id, menu_size, custom_tags, dish_type_options, diet_options, cuisine_options, updated_at
     FROM user_preferences WHERE updated_at > ${since}
   `;
 
@@ -113,6 +123,9 @@ async function handlePull(req: VercelRequest, res: VercelResponse) {
         id: prefRows[0].id,
         menuSize: prefRows[0].menu_size,
         customTags: prefRows[0].custom_tags ?? [],
+        dishTypeOptions: prefRows[0].dish_type_options ?? [],
+        dietOptions: prefRows[0].diet_options ?? [],
+        cuisineOptions: prefRows[0].cuisine_options ?? [],
         updatedAt: Number(prefRows[0].updated_at),
       }
     : undefined;
@@ -169,10 +182,12 @@ async function handlePush(req: VercelRequest, res: VercelResponse) {
       if (existing.length === 0 || Number(existing[0].updated_at) < r.updatedAt) {
         await sql`
           INSERT INTO recipes (id, url, title, image_url, ingredients, ingredients_source,
-                               tags, date_added, updated_at, last_shown, times_shown, deleted_at)
+                               tags, dish_type, diet, cuisine,
+                               date_added, updated_at, last_shown, times_shown, deleted_at)
           VALUES (${r.id}, ${r.url}, ${r.title}, ${r.imageUrl ?? null},
                   ${JSON.stringify(r.ingredients)}, ${r.ingredientsSource},
-                  ${JSON.stringify(r.tags)}, ${r.dateAdded}, ${r.updatedAt},
+                  ${JSON.stringify(r.tags)}, ${r.dishType ?? null}, ${r.diet ?? null}, ${r.cuisine ?? null},
+                  ${r.dateAdded}, ${r.updatedAt},
                   ${r.lastShown ?? null}, ${r.timesShown}, ${r.deletedAt ?? null})
           ON CONFLICT (id) DO UPDATE SET
             url = EXCLUDED.url,
@@ -181,6 +196,9 @@ async function handlePush(req: VercelRequest, res: VercelResponse) {
             ingredients = EXCLUDED.ingredients,
             ingredients_source = EXCLUDED.ingredients_source,
             tags = EXCLUDED.tags,
+            dish_type = EXCLUDED.dish_type,
+            diet = EXCLUDED.diet,
+            cuisine = EXCLUDED.cuisine,
             date_added = EXCLUDED.date_added,
             updated_at = EXCLUDED.updated_at,
             last_shown = EXCLUDED.last_shown,
@@ -199,11 +217,16 @@ async function handlePush(req: VercelRequest, res: VercelResponse) {
 
     if (existing.length === 0 || Number(existing[0].updated_at) < preferences.updatedAt) {
       await sql`
-        INSERT INTO user_preferences (id, menu_size, custom_tags, updated_at)
-        VALUES (${preferences.id}, ${preferences.menuSize}, ${JSON.stringify(preferences.customTags ?? [])}, ${preferences.updatedAt})
+        INSERT INTO user_preferences (id, menu_size, custom_tags, dish_type_options, diet_options, cuisine_options, updated_at)
+        VALUES (${preferences.id}, ${preferences.menuSize}, ${JSON.stringify(preferences.customTags ?? [])},
+                ${JSON.stringify(preferences.dishTypeOptions ?? [])}, ${JSON.stringify(preferences.dietOptions ?? [])},
+                ${JSON.stringify(preferences.cuisineOptions ?? [])}, ${preferences.updatedAt})
         ON CONFLICT (id) DO UPDATE SET
           menu_size = EXCLUDED.menu_size,
           custom_tags = EXCLUDED.custom_tags,
+          dish_type_options = EXCLUDED.dish_type_options,
+          diet_options = EXCLUDED.diet_options,
+          cuisine_options = EXCLUDED.cuisine_options,
           updated_at = EXCLUDED.updated_at
       `;
     }

@@ -120,6 +120,9 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   id: 'default',
   menuSize: 4,
   customTags: [],
+  dishTypeOptions: [],
+  dietOptions: [],
+  cuisineOptions: [],
   updatedAt: Date.now(),
   syncStatus: 'pending',
 };

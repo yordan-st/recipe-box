@@ -6,6 +6,9 @@ export interface Recipe {
   ingredients: string[];
   ingredientsSource: 'auto' | 'manual';
   tags: string[];
+  dishType?: string;
+  diet?: string;
+  cuisine?: string;
   dateAdded: number;
   updatedAt: number;
   lastShown?: number;
@@ -28,6 +31,9 @@ export interface UserPreferences {
   id: string;
   menuSize: number;
   customTags?: string[];
+  dishTypeOptions?: string[];
+  dietOptions?: string[];
+  cuisineOptions?: string[];
   updatedAt: number;
   syncStatus: 'pending' | 'synced';
 }

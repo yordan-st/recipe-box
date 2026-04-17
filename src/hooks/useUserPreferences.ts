@@ -20,31 +20,31 @@ export function useUserPreferences() {
     [],
   );
 
-  const addCustomTag = useCallback(
-    async (tag: string) => {
-      const current = preferences?.customTags ?? [];
-      const normalized = tag.trim().toLowerCase();
+  const addOption = useCallback(
+    async (category: 'dishTypeOptions' | 'dietOptions' | 'cuisineOptions', option: string) => {
+      const current = preferences?.[category] ?? [];
+      const normalized = option.trim().toLowerCase();
       if (!normalized || current.includes(normalized)) return;
-      await updateUserPreferences({ customTags: [...current, normalized] });
+      await updateUserPreferences({ [category]: [...current, normalized] });
       scheduleSyncAfterMutation();
     },
-    [preferences?.customTags],
+    [preferences],
   );
 
-  const removeCustomTag = useCallback(
-    async (tag: string) => {
-      const current = preferences?.customTags ?? [];
-      await updateUserPreferences({ customTags: current.filter((t) => t !== tag) });
+  const removeOption = useCallback(
+    async (category: 'dishTypeOptions' | 'dietOptions' | 'cuisineOptions', option: string) => {
+      const current = preferences?.[category] ?? [];
+      await updateUserPreferences({ [category]: current.filter((t) => t !== option) });
       scheduleSyncAfterMutation();
     },
-    [preferences?.customTags],
+    [preferences],
   );
 
   return {
-    preferences: preferences ?? { id: 'default', menuSize: 4, customTags: [], updatedAt: 0, syncStatus: 'pending' as const },
+    preferences: preferences ?? { id: 'default', menuSize: 4, customTags: [], dishTypeOptions: [], dietOptions: [], cuisineOptions: [], updatedAt: 0, syncStatus: 'pending' as const },
     isLoading: preferences === undefined,
     updatePreferences: update,
-    addCustomTag,
-    removeCustomTag,
+    addOption,
+    removeOption,
   };
 }

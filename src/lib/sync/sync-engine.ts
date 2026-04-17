@@ -18,7 +18,7 @@ import type { Recipe, UserPreferences, WeeklyMenu, GroceryChecklist } from '@/ty
 
 interface PullResponse {
   recipes: Array<Omit<Recipe, 'syncStatus'>>;
-  preferences?: { id: string; menuSize: number; customTags?: string[]; updatedAt: number };
+  preferences?: { id: string; menuSize: number; customTags?: string[]; dishTypeOptions?: string[]; dietOptions?: string[]; cuisineOptions?: string[]; updatedAt: number };
   weeklyMenus: Array<Omit<WeeklyMenu, 'syncStatus'>>;
   groceryChecklists: Array<Omit<GroceryChecklist, 'syncStatus'>>;
   serverTime: number;

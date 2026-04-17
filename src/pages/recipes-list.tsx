@@ -36,7 +36,9 @@ export function RecipesListPage() {
         const q = searchQuery.trim().toLowerCase();
         return (
           r.title.toLowerCase().includes(q) ||
-          r.tags?.some((tag) => tag.toLowerCase().includes(q))
+          r.dishType?.toLowerCase().includes(q) ||
+          r.diet?.toLowerCase().includes(q) ||
+          r.cuisine?.toLowerCase().includes(q)
         );
       })
     : recipes;
